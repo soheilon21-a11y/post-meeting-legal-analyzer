@@ -1,0 +1,135 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile.api
+      target: development
+    image: post-meeting-legal-analyzer-api:dev
+    container_name: legal-analyzer-api-dev
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    environment:
+      - APP_ENV=development
+      - APP_DEBUG=true
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-legal_analyzer}
+      - POSTGRES_USER=${POSTGRES_USER:-legal_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-me-postgres-password}
+      - POSTGRES_ECHO=true
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - OLLAMA_HOST=http://ollama:11434
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - JWT_SECRET_KEY=${APP_SECRET_KEY:-dev-secret-key-do-not-use-in-production}
+      - LOG_LEVEL=DEBUG
+      - LOG_FORMAT=text
+    command: >
+      uvicorn app.main:create_app --factory
+      --reload
+      --host 0.0.0.0
+      --port 8000
+      --reload-dir /app
+    volumes:
+      - ./app:/app/app:ro
+      - ./alembic:/app/alembic:ro
+      - ./pyproject.toml:/app/pyproject.toml:ro
+      - uploads_data:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - legal-net
+
+  worker:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile.worker
+      target: development
+    image: post-meeting-legal-analyzer-worker:dev
+    container_name: legal-analyzer-worker-dev
+    restart: unless-stopped
+    environment:
+      - APP_ENV=development
+      - APP_DEBUG=true
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-legal_analyzer}
+      - POSTGRES_USER=${POSTGRES_USER:-legal_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-me-postgres-password}
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - OLLAMA_HOST=http://ollama:11434
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./app:/app/app:ro
+      - uploads_data:/app/uploads
+      - models_data:/models:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - legal-net
+
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+
+  qdrant:
+    extends:
+      file: docker-compose.yml
+      service: qdrant
+
+  redis:
+    extends:
+      file: docker-compose.yml
+      service: redis
+
+  ollama:
+    extends:
+      file: docker-compose.yml
+      service: ollama
+
+  minio:
+    extends:
+      file: docker-compose.yml
+      service: minio
+
+  minio-bootstrap:
+    extends:
+      file: docker-compose.yml
+      service: minio-bootstrap
+
+volumes:
+  pgdata:
+  qdrant_data:
+  redis_data:
+  ollama_data:
+  minio_data:
+  uploads_data:
+  models_data:
+
+networks:
+  legal-net:
+    driver: bridge

@@ -1,0 +1,265 @@
+services:
+  # =========================================================================
+  # API Server
+  # =========================================================================
+  api:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile.api
+    image: post-meeting-legal-analyzer-api:latest
+    container_name: legal-analyzer-api
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    environment:
+      - APP_ENV=production
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-legal_analyzer}
+      - POSTGRES_USER=${POSTGRES_USER:-legal_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-me-postgres-password}
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - OLLAMA_HOST=http://ollama:11434
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - JWT_SECRET_KEY=${APP_SECRET_KEY:-change-me}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_FORMAT=${LOG_FORMAT:-json}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/live"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - legal-net
+
+  # =========================================================================
+  # Background Worker
+  # =========================================================================
+  worker:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile.worker
+    image: post-meeting-legal-analyzer-worker:latest
+    container_name: legal-analyzer-worker
+    restart: unless-stopped
+    environment:
+      - APP_ENV=production
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-legal_analyzer}
+      - POSTGRES_USER=${POSTGRES_USER:-legal_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-me-postgres-password}
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - OLLAMA_HOST=http://ollama:11434
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - MODEL_DIR=/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads:ro
+      - models_data:/models:ro
+    networks:
+      - legal-net
+
+  # =========================================================================
+  # PostgreSQL 17
+  # =========================================================================
+  postgres:
+    image: postgres:17-alpine
+    container_name: legal-analyzer-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-legal_analyzer}
+      - POSTGRES_USER=${POSTGRES_USER:-legal_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-me-postgres-password}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-legal_user} -d ${POSTGRES_DB:-legal_analyzer}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - legal-net
+
+  # =========================================================================
+  # Qdrant (Vector Database)
+  # =========================================================================
+  qdrant:
+    image: qdrant/qdrant:v1.13.0
+    container_name: legal-analyzer-qdrant
+    restart: unless-stopped
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+      - QDRANT__LOG_LEVEL=INFO
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+      - "${QDRANT_GRPC_PORT:-6334}:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - legal-net
+
+  # =========================================================================
+  # Redis 7 (Task Queue / Cache)
+  # =========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: legal-analyzer-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory-policy allkeys-lru
+      --maxmemory 512mb
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      - legal-net
+
+  # =========================================================================
+  # Ollama (Local LLM Runtime)
+  # =========================================================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: legal-analyzer-ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - legal-net
+
+  # =========================================================================
+  # MinIO (S3-Compatible Object Storage)
+  # =========================================================================
+  minio:
+    image: minio/minio:latest
+    container_name: legal-analyzer-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY:-minioadmin123}
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - legal-net
+
+  # =========================================================================
+  # MinIO Bootstrap (Create Buckets on Startup)
+  # =========================================================================
+  minio-bootstrap:
+    image: minio/mc:latest
+    container_name: legal-analyzer-minio-bootstrap
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 ${MINIO_ACCESS_KEY:-minioadmin} ${MINIO_SECRET_KEY:-minioadmin123};
+      mc mb --ignore-existing local/${MINIO_BUCKET_DOCUMENTS:-legal-documents};
+      mc mb --ignore-existing local/${MINIO_BUCKET_REPORTS:-legal-reports};
+      mc anonymous set download local/${MINIO_BUCKET_REPORTS:-legal-reports};
+      echo 'MinIO buckets initialized';
+      exit 0;
+      "
+    networks:
+      - legal-net
+
+# ===========================================================================
+# Volumes
+# ===========================================================================
+volumes:
+  pgdata:
+    driver: local
+  qdrant_data:
+    driver: local
+  redis_data:
+    driver: local
+  ollama_data:
+    driver: local
+  minio_data:
+    driver: local
+  uploads_data:
+    driver: local
+  models_data:
+    driver: local
+
+# ===========================================================================
+# Networks
+# ===========================================================================
+networks:
+  legal-net:
+    driver: bridge

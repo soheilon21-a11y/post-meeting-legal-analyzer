@@ -1,0 +1,78 @@
+# =============================================================================
+# API Server Dockerfile — Multi-stage build
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Stage 1: Base Python image with common dependencies
+# ---------------------------------------------------------------------------
+FROM python:3.13-slim AS base
+
+ENV PYTHONFAULTHANDLER=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN groupadd --system --gid 1000 legal && \
+    useradd --system --uid 1000 --gid legal --create-home legal
+
+WORKDIR /app
+
+# ---------------------------------------------------------------------------
+# Stage 2: Builder — install compiled dependencies
+# ---------------------------------------------------------------------------
+FROM base AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml .
+
+RUN pip install --upgrade pip setuptools wheel && \
+    pip wheel --wheel-dir=/wheels -e ".[dev]"
+
+# ---------------------------------------------------------------------------
+# Stage 3: Production runtime
+# ---------------------------------------------------------------------------
+FROM base AS production
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /wheels /wheels
+RUN pip install --no-index --find-links=/wheels /wheels/*.whl && \
+    rm -rf /wheels
+
+COPY app/ /app/app/
+COPY alembic/ /app/alembic/
+COPY alembic.ini /app/alembic.ini
+
+RUN mkdir -p /app/uploads /app/exports && \
+    chown -R legal:legal /app
+
+USER legal
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=15s \
+    CMD curl -f http://localhost:8000/health/live || exit 1
+
+CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+
+# ---------------------------------------------------------------------------
+# Stage 4: Development runtime
+# ---------------------------------------------------------------------------
+FROM production AS development
+
+USER root
+
+RUN pip install -e ".[dev]"
+
+USER legal
+
+CMD ["uvicorn", "app.main:create_app", "--factory", "--reload", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,190 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "post-meeting-legal-analyzer"
+version = "0.1.0"
+description = "Privacy-first LegalTech platform for analyzing legal meeting outputs using local AI"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Post-Meeting Legal Analyzer Contributors" },
+]
+keywords = [
+    "legaltech",
+    "rag",
+    "llm",
+    "privacy-first",
+    "local-ai",
+    "legal-analysis",
+    "redlining",
+    "fastapi",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Legal Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.13",
+    "Framework :: FastAPI",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Office/Business :: Office Suites",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.115.0,<0.116.0",
+    "uvicorn[standard]>=0.34.0,<0.35.0",
+    "sqlalchemy[asyncio]>=2.0.36,<2.1.0",
+    "asyncpg>=0.30.0,<0.31.0",
+    "alembic>=1.14.0,<1.15.0",
+    "pydantic>=2.10.0,<2.11.0",
+    "pydantic-settings>=2.7.0,<2.8.0",
+    "python-jose[cryptography]>=3.3.0,<3.4.0",
+    "passlib[argon2]>=1.7.4,<1.8.0",
+    "bcrypt>=4.2.0,<4.3.0",
+    "httpx>=0.28.0,<0.29.0",
+    "redis>=5.2.0,<5.3.0",
+    "qdrant-client>=1.12.0,<1.13.0",
+    "ollama>=0.4.0,<0.5.0",
+    "python-multipart>=0.0.18,<0.1.0",
+    "aiofiles>=24.1.0,<24.2.0",
+    "tenacity>=9.0.0,<10.0.0",
+    "structlog>=24.4.0,<24.5.0",
+    "orjson>=3.10.0,<3.11.0",
+    "python-docx>=1.1.0,<1.2.0",
+    "pymupdf>=1.25.0,<1.26.0",
+    "weasyprint>=63.0,<64.0",
+    "markdown-it-py>=3.0.0,<3.1.0",
+    "sentence-transformers>=3.3.0,<3.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.8.0,<0.9.0",
+    "black>=24.10.0,<24.11.0",
+    "mypy>=1.13.0,<1.14.0",
+    "pre-commit>=4.0.0,<4.1.0",
+    "pytest>=8.3.0,<8.4.0",
+    "pytest-asyncio>=0.24.0,<0.25.0",
+    "pytest-cov>=6.0.0,<6.1.0",
+    "httpx>=0.28.0,<0.29.0",
+    "testcontainers>=4.8.0,<4.9.0",
+]
+worker = [
+    "celery>=5.4.0,<5.5.0",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "alembic/versions",
+    "migrations",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "UP",  # pyupgrade
+    "RUF", # ruff-specific
+    "TCH", # flake8-type-checking
+    "TID", # flake8-tidy-imports
+    "PLC", # pylint conventions
+    "PLE", # pylint errors
+    "PLW", # pylint warnings
+]
+ignore = [
+    "PLC0415",  # import outside top-level allowed in type-checking blocks
+    "PLR0913",  # too-many-arguments handled via code review
+    "B008",     # fastapi depends on B008 patterns
+]
+isort.known-first-party = ["app"]
+isort.force-single-line = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "PLR2004", "B017"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_return_any = true
+show_error_codes = true
+exclude = [
+    "alembic/",
+    "tests/",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "passlib.*",
+    "python_jose.*",
+    "qdrant_client.*",
+    "ollama.*",
+    "sentence_transformers.*",
+    "pymupdf.*",
+    "weasyprint.*",
+    "python_docx.*",
+    "tenacity.*",
+    "testcontainers.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "8.3"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-v",
+    "--tb=short",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "e2e: marks tests as end-to-end tests",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["tests/*", "alembic/*"]
+
+[tool.coverage.report]
+exclude_also = [
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
