@@ -14,7 +14,7 @@ Privacy-first LegalTech platform for analyzing legal meeting outputs using local
 
 ### Prerequisites
 
-- Python 3.13+
+- Python 3.12+
 - Docker and Docker Compose
 - [Ollama](https://ollama.ai) (for local LLM inference)
 
@@ -22,7 +22,7 @@ Privacy-first LegalTech platform for analyzing legal meeting outputs using local
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/soheilon21-a11y/post-meeting-legal-analyzer.git
 cd post-meeting-legal-analyzer
 
 # Copy environment configuration

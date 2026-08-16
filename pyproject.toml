@@ -25,7 +25,7 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Legal Industry",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.12",
     "Framework :: FastAPI",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Office/Business :: Office Suites",
