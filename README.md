@@ -9,8 +9,8 @@ Privacy-first LegalTech platform for analyzing legal meeting outputs using local
 - **RAG pipeline**: Qdrant vector retrieval with structure-aware chunking and local Ollama embeddings
 - **AI-assisted redlining**: Human-in-the-loop clause comparison with evidence citations
 - **Production-ready**: FastAPI, PostgreSQL, Docker, comprehensive testing
-- **Traceability & auditability: audit event system with request IDs and timing middleware
-- **Compliance: domain invariant validation and explicit state transitions
+- **Traceability & auditability**: audit event system with request IDs and timing middleware
+- **Compliance**: domain invariant validation and explicit state transitions
 
 ## Quick Start
 
