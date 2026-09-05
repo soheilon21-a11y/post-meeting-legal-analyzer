@@ -101,8 +101,8 @@ class OllamaSettings(BaseSettings):
     )
 
     host: str = Field(default="http://localhost:11434")
-    default_model: str = Field(default="llama3.2")
-    legal_model: str = Field(default="llama3.2")
+    default_model: str = Field(default="llama3:latest")
+    legal_model: str = Field(default="llama3:latest")
     embedding_model: str = Field(default="nomic-embed-text")
     timeout_seconds: int = Field(default=300, ge=10)
     max_retries: int = Field(default=3, ge=1, le=10)
