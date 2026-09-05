@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from uuid import UUID
+from typing import TYPE_CHECKING
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.db.models.matter import Matter, MatterMember, MatterMemberRole
+from app.db.models.matter import Matter
+from app.db.models.matter import MatterMember
+from app.db.models.matter import MatterMemberRole
 from app.infrastructure.database.repositories.base import SQLRepository
+
+if TYPE_CHECKING:
+    from uuid import UUID
+
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class MatterRepository(SQLRepository[Matter]):

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import TYPE_CHECKING
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +18,9 @@ from app.core.exceptions.handlers import app_error_handler
 from app.core.exceptions.handlers import generic_exception_handler
 from app.core.lifecycle.manager import LifecycleManager
 from app.core.logging import configure_logging
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 _lifecycle = LifecycleManager()
 
@@ -37,7 +40,10 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app.name,
         version="0.1.0",
-        description="Privacy-first LegalTech platform for analyzing legal meeting outputs using local AI",
+        description=(
+            "Privacy-first LegalTech platform for analyzing legal meeting "
+            "outputs using local AI"
+        ),
         docs_url="/docs" if settings.app.debug else None,
         redoc_url="/redoc" if settings.app.debug else None,
         lifespan=_lifespan,
@@ -55,7 +61,7 @@ def _configure_middleware(app: FastAPI) -> None:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.app.debug and ["*"] or [],
+        allow_origins=(settings.app.debug and ["*"]) or [],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

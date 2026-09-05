@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from fastapi import Depends, Header
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import Depends
+from fastapi import Header
+from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer
 
 from app.core.exceptions.domain import UnauthorizedError
-from app.core.security.tokens import TokenPayload, TokenService
+from app.core.security.tokens import TokenPayload
+from app.core.security.tokens import TokenService
 
 _bearer_scheme = HTTPBearer(auto_error=False)
 

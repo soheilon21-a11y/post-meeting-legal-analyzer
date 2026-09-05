@@ -3,12 +3,33 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Float, ForeignKey, String, Text
+from sqlalchemy import Boolean
+from sqlalchemy import DateTime
+from sqlalchemy import Enum
+from sqlalchemy import Float
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
-from app.db.base import Base, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.base import UUIDMixin
+from app.db.base import TimestampMixin
+
+if TYPE_CHECKING:
+    import uuid
+    from datetime import datetime
+
+    from app.db.models.document import DocumentVersion
+    from app.db.models.matter import Matter
+    from app.db.models.prompt import PromptVersion
+    from app.db.models.user import User
 
 
 class RedlineStatus(StrEnum):
@@ -70,9 +91,15 @@ class RedlineJob(Base, UUIDMixin, TimestampMixin):
         lazy="selectin",
         cascade="all, delete-orphan",
     )
-    base_version: Mapped[DocumentVersion] = relationship("DocumentVersion", foreign_keys=[base_document_version_id], lazy="selectin")
-    comparison_version: Mapped[DocumentVersion] = relationship("DocumentVersion", foreign_keys=[comparison_document_version_id], lazy="selectin")
-    prompt_version: Mapped[PromptVersion | None] = relationship("PromptVersion", back_populates="redline_jobs", lazy="selectin")
+    base_version: Mapped[DocumentVersion] = relationship(
+        "DocumentVersion", foreign_keys=[base_document_version_id], lazy="selectin"
+    )
+    comparison_version: Mapped[DocumentVersion] = relationship(
+        "DocumentVersion", foreign_keys=[comparison_document_version_id], lazy="selectin"
+    )
+    prompt_version: Mapped[PromptVersion | None] = relationship(
+        "PromptVersion", back_populates="redline_jobs", lazy="selectin"
+    )
 
     def __repr__(self) -> str:
         return f"<RedlineJob id={self.id} status={self.status!r}>"
@@ -100,8 +127,13 @@ class RedlineChange(Base, UUIDMixin, TimestampMixin):
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
     source_citations: Mapped[dict | None] = mapped_column(JSONB, default=None)
 
-    redline_job: Mapped[RedlineJob] = relationship("RedlineJob", back_populates="changes", lazy="selectin")
+    redline_job: Mapped[RedlineJob] = relationship(
+        "RedlineJob", back_populates="changes", lazy="selectin"
+    )
     approved_by: Mapped[User | None] = relationship("User", lazy="selectin")
 
     def __repr__(self) -> str:
-        return f"<RedlineChange id={self.id} type={self.change_type!r} review={self.review_status!r}>"
+        return (
+            f"<RedlineChange id={self.id} type={self.change_type!r} "
+            f"review={self.review_status!r}>"
+        )

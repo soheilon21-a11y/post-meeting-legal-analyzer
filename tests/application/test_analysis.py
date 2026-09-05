@@ -545,3 +545,40 @@ async def test_analysis_with_optimizer_passes_reduced_context_to_generation() ->
     assert request.transcript == "The parties agreed."
     assert len(request.evidence) == 0
     assert request.analysis_type == "full_meeting"
+
+
+class _RecordingRetrieval(RetrievalPort):
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, str, int]] = []
+
+    async def retrieve(self, matter_id: str, query: str, limit: int) -> tuple[EvidenceInput, ...]:
+        self.calls.append((matter_id, query, limit))
+        return ()
+
+
+@pytest.mark.anyio
+async def test_service_scopes_retrieval_to_matter_id_when_provided() -> None:
+    _, _, meeting = _fixture()
+    analysis = LegalAnalysis(AnalysisType.FULL_MEETING)
+    retrieval = _RecordingRetrieval()
+    service = AnalysisApplicationService(
+        retrieval,
+        FakeGeneration(),
+        matter_id="matter-abc",
+    )
+
+    await service.execute(analysis, meeting)
+
+    assert retrieval.calls[0][0] == "matter-abc"
+
+
+@pytest.mark.anyio
+async def test_service_defaults_retrieval_scope_to_analysis_id() -> None:
+    _, _, meeting = _fixture()
+    analysis = LegalAnalysis(AnalysisType.FULL_MEETING)
+    retrieval = _RecordingRetrieval()
+    service = AnalysisApplicationService(retrieval, FakeGeneration())
+
+    await service.execute(analysis, meeting)
+
+    assert retrieval.calls[0][0] == str(analysis.id)

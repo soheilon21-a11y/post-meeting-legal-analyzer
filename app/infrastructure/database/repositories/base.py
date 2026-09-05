@@ -1,12 +1,21 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
-from uuid import UUID
+from abc import ABC
+from abc import abstractmethod
+from typing import TYPE_CHECKING
+from typing import Generic
+from typing import TypeVar
 
-from sqlalchemy import delete, func, select, update
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import delete
+from sqlalchemy import func
+from sqlalchemy import select
+from sqlalchemy import update
 from sqlalchemy.orm import DeclarativeBase
+
+if TYPE_CHECKING:
+    from uuid import UUID
+
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 T = TypeVar("T", bound=DeclarativeBase)
 
@@ -86,7 +95,8 @@ class SQLRepository(AbstractRepository[T]):
 
     async def delete(self, id: UUID, soft: bool = True) -> bool:
         if soft and hasattr(self._model, "deleted_at"):
-            from datetime import UTC, datetime
+            from datetime import UTC
+            from datetime import datetime
 
             stmt = (
                 update(self._model)

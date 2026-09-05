@@ -55,7 +55,10 @@ async def main() -> None:
 
     print("\n=== ACTION ITEMS ===")
     for item in result.action_items:
-        print(f"  - {item.title} (responsible={item.responsible_party}, confidence={item.confidence})")
+        print(
+            f"  - {item.title} (responsible={item.responsible_party}, "
+            f"confidence={item.confidence})"
+        )
         print(f"    {item.description}")
         if item.due_date:
             print(f"    Due: {item.due_date}")

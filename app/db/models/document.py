@@ -1,13 +1,32 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Boolean
+from sqlalchemy import DateTime
+from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import Text
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
-from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.base import UUIDMixin
+from app.db.base import TimestampMixin
+from app.db.base import SoftDeleteMixin
+
+if TYPE_CHECKING:
+    import uuid
+
+    from app.db.models.matter import Matter
+    from app.db.models.prompt import Embedding
+    from app.db.models.user import User
 
 
 class DocumentType(StrEnum):
@@ -91,7 +110,9 @@ class DocumentVersion(Base, UUIDMixin, TimestampMixin):
         ForeignKey("users.id", ondelete="SET NULL"), default=None, nullable=True
     )
 
-    document: Mapped[Document] = relationship("Document", back_populates="versions", lazy="selectin")
+    document: Mapped[Document] = relationship(
+        "Document", back_populates="versions", lazy="selectin"
+    )
     segments: Mapped[list[DocumentSegment]] = relationship(
         "DocumentSegment",
         back_populates="document_version",

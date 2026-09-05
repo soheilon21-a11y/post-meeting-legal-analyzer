@@ -3,16 +3,25 @@ from __future__ import annotations
 import uuid
 
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.db.base import Base
-from app.db.models.analysis import Analysis, AnalysisItem
+from app.db.models.analysis import Analysis
+from app.db.models.analysis import AnalysisItem
 from app.db.models.audit import AuditEvent
-from app.db.models.document import Document, DocumentSegment, DocumentType, DocumentVersion
-from app.db.models.matter import Matter, MatterMember
-from app.db.models.meeting import Meeting, TranscriptSegment
+from app.db.models.document import Document
+from app.db.models.document import DocumentSegment
+from app.db.models.document import DocumentVersion
+from app.db.models.matter import Matter
+from app.db.models.matter import MatterMember
+from app.db.models.meeting import Meeting
+from app.db.models.meeting import TranscriptSegment
 from app.db.models.organization import Organization
-from app.db.models.redline import RedlineChange, RedlineJob
+from app.db.models.redline import RedlineChange
+from app.db.models.redline import RedlineJob
+from app.db.models.user import User
 
 
 @pytest.fixture
@@ -56,8 +65,9 @@ async def test_organization_creation(db_session: AsyncSession):
 
 @pytest.mark.anyio
 async def test_matter_with_member(db_session: AsyncSession, sample_org_id, sample_user_id):
+    user = User(id=sample_user_id, email="test@example.com", display_name="Test User", organization_id=sample_org_id, hashed_password="hashed")
     org = Organization(id=sample_org_id, name="Test Firm")
-    db_session.add(org)
+    db_session.add_all([org, user])
     await db_session.flush()
 
     matter = Matter(organization_id=sample_org_id, name="Test Matter")
@@ -127,7 +137,8 @@ async def test_meeting_with_transcript(db_session: AsyncSession, sample_org_id):
         title="Client Meeting",
         meeting_date=uuid.uuid4(),  # placeholder, replaced below
     )
-    from datetime import UTC, datetime
+    from datetime import UTC
+    from datetime import datetime
 
     meeting.meeting_date = datetime.now(UTC)
     db_session.add(meeting)
@@ -158,7 +169,8 @@ async def test_analysis_with_items(db_session: AsyncSession, sample_org_id):
         title="Test Meeting",
         meeting_date=uuid.uuid4(),
     )
-    from datetime import UTC, datetime
+    from datetime import UTC
+    from datetime import datetime
 
     meeting.meeting_date = datetime.now(UTC)
     db_session.add(meeting)
@@ -239,8 +251,9 @@ async def test_redline_job_with_changes(db_session: AsyncSession, sample_org_id)
 
 @pytest.mark.anyio
 async def test_audit_event(db_session: AsyncSession, sample_org_id, sample_user_id):
+    user = User(id=sample_user_id, email="test@example.com", display_name="Test User", organization_id=sample_org_id, hashed_password="hashed")
     org = Organization(id=sample_org_id, name="Test Firm")
-    db_session.add(org)
+    db_session.add_all([org, user])
     await db_session.flush()
 
     event = AuditEvent(

@@ -1,24 +1,25 @@
 from __future__ import annotations
 
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 
-from fastapi import Request
 from fastapi.responses import JSONResponse
 
-from app.core.exceptions.domain import (
-    AppError,
-    ConflictError,
-    FileTooLargeError,
-    FileProcessingError,
-    ForbiddenError,
-    NotFoundError,
-    ProcessingNotCompleteError,
-    TokenBudgetExceededError,
-    UnauthorizedError,
-    UnsupportedFileTypeError,
-    ValidationError,
-)
+from app.core.exceptions.domain import AppError
+from app.core.exceptions.domain import ConflictError
+from app.core.exceptions.domain import FileProcessingError
+from app.core.exceptions.domain import FileTooLargeError
+from app.core.exceptions.domain import ForbiddenError
+from app.core.exceptions.domain import NotFoundError
+from app.core.exceptions.domain import ProcessingNotCompleteError
+from app.core.exceptions.domain import TokenBudgetExceededError
+from app.core.exceptions.domain import UnauthorizedError
+from app.core.exceptions.domain import UnsupportedFileTypeError
+from app.core.exceptions.domain import ValidationError
 from app.core.logging import get_logger
+
+if TYPE_CHECKING:
+    from fastapi import Request
 
 logger = get_logger(__name__)
 

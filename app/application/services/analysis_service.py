@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from app.application.ports.rag_retrieval import RetrievalPort
     from app.application.services.context_optimizer import ContextOptimizer
     from app.domain.meeting.entities import Meeting
+    from app.domain.ports.event_dispatcher import EventDispatcher
 
 
 class AnalysisApplicationService:
@@ -39,6 +40,8 @@ class AnalysisApplicationService:
         model_name: str = "default",
         max_input: int | None = None,
         reserved_output: int = 0,
+        matter_id: str | None = None,
+        event_dispatcher: EventDispatcher | None = None,
     ) -> None:
         self._retrieval = retrieval
         self._generation = generation
@@ -46,11 +49,14 @@ class AnalysisApplicationService:
         self._model_name = model_name
         self._max_input = max_input
         self._reserved_output = reserved_output
+        self._matter_id = matter_id
+        self._event_dispatcher = event_dispatcher
 
     async def execute(self, analysis: LegalAnalysis, meeting: Meeting) -> None:
         analysis.begin_processing()
         transcript = "\n".join(segment.text for segment in meeting.transcript)
-        evidence = await self._retrieval.retrieve(str(analysis.id), transcript, limit=20)
+        retrieval_scope = self._matter_id or str(analysis.id)
+        evidence = await self._retrieval.retrieve(retrieval_scope, transcript, limit=20)
 
         if self._optimizer is not None:
             optimized = await self._optimizer.optimize(
@@ -74,6 +80,8 @@ class AnalysisApplicationService:
             )
         )
         self.apply_result(analysis, result)
+        if self._event_dispatcher is not None:
+            await self._event_dispatcher.dispatch_many(analysis.pull_events())
 
     def apply_result(self, analysis: LegalAnalysis, result: AnalysisGenerationResult) -> None:
         for risk in result.risks:

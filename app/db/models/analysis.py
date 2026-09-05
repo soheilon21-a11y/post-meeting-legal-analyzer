@@ -3,12 +3,28 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime
+from sqlalchemy import Float
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
-from app.db.base import Base, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.base import TimestampMixin
+from app.db.base import UUIDMixin
+
+if TYPE_CHECKING:
+    from app.db.models.matter import Matter
+    from app.db.models.meeting import Meeting
+    from app.db.models.prompt import PromptVersion
+    from app.db.models.user import User
 
 
 class AnalysisStatus(StrEnum):
@@ -141,7 +157,9 @@ class Citation(Base, UUIDMixin):
     quoted_text: Mapped[str | None] = mapped_column(Text, default=None)
     relevance_score: Mapped[float | None] = mapped_column(Float, default=None)
 
-    analysis: Mapped[Analysis] = relationship("Analysis", back_populates="citations", lazy="selectin")
+    analysis: Mapped[Analysis] = relationship(
+        "Analysis", back_populates="citations", lazy="selectin"
+    )
     item: Mapped[AnalysisItem | None] = relationship(
         "AnalysisItem", back_populates="citations", lazy="selectin"
     )

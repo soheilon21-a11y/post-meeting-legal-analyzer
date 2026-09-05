@@ -10,6 +10,8 @@ from app.domain.analysis.rules import ensure_analysis_can_be_approved
 from app.domain.analysis.rules import ensure_analysis_can_change
 from app.domain.analysis.rules import ensure_item_can_complete
 from app.domain.analysis.rules import ensure_material_item_has_evidence
+from app.domain.events.analysis_events import AnalysisApproved
+from app.domain.events.analysis_events import AnalysisReadyForReview
 from app.domain.exceptions.evidence import MissingEvidence
 from app.domain.exceptions.invariant import InvariantViolation
 from app.domain.exceptions.lifecycle import InvalidStateTransition
@@ -237,10 +239,12 @@ class LegalAnalysis(AggregateRoot[AnalysisId]):
         if not self._summary:
             raise InvariantViolation("An analysis requires a summary before review")
         self._status = AnalysisStatus.READY_FOR_REVIEW
+        self.record_event(AnalysisReadyForReview(aggregate_id=self.id))
 
     def approve(self) -> None:
         ensure_analysis_can_be_approved(self._status, len(self._items))
         self._status = AnalysisStatus.APPROVED
+        self.record_event(AnalysisApproved(aggregate_id=self.id))
 
     def reject(self) -> None:
         if self._status is not AnalysisStatus.READY_FOR_REVIEW:

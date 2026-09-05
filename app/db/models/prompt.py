@@ -1,12 +1,29 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
-from app.db.base import Base, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.base import TimestampMixin
+from app.db.base import UUIDMixin
+
+if TYPE_CHECKING:
+    import uuid
+
+    from app.db.models.analysis import Analysis
+    from app.db.models.document import DocumentSegment
+    from app.db.models.redline import RedlineJob
+    from app.db.models.user import User
 
 
 class PromptVersion(Base, UUIDMixin, TimestampMixin):

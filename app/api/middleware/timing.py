@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import time
+from typing import TYPE_CHECKING
 
-from fastapi import Request
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.responses import Response
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import RequestResponseEndpoint
 
 from app.core.logging import get_logger
+
+if TYPE_CHECKING:
+    from fastapi import Request
+    from starlette.responses import Response
 
 logger = get_logger(__name__)
 

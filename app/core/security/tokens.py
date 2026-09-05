@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC
+from datetime import datetime
+from datetime import timedelta
 from typing import Any
 from uuid import uuid4
 
-from jose import JWTError, jwt
+from jose import JWTError
+from jose import jwt
 
-from app.core.config.settings import JwtSettings, get_settings
+from app.core.config.settings import JwtSettings
+from app.core.config.settings import get_settings
 
 
 class TokenPayload:
@@ -20,6 +24,7 @@ class TokenPayload:
         token_type: str = "access",
     ) -> None:
         self.sub = sub
+        self.token_type = token_type
         self.org_id = org_id
         self.exp = exp or self._default_expiry()
         self.iat = iat or datetime.now(UTC)

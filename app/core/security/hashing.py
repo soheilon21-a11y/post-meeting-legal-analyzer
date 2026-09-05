@@ -1,13 +1,8 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
-from typing import Any
-from uuid import uuid4
-
-from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from app.core.config.settings import JwtSettings, SecuritySettings, get_settings
+from app.core.config.settings import get_settings
 
 _pwd_context = CryptContext(
     schemes=["bcrypt", "argon2"],

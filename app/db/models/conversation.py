@@ -2,12 +2,26 @@ from __future__ import annotations
 
 import uuid
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy import ForeignKey
+from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
-from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.base import SoftDeleteMixin
+from app.db.base import TimestampMixin
+from app.db.base import UUIDMixin
+
+if TYPE_CHECKING:
+    import uuid
+
+    from app.db.models.matter import Matter
+    from app.db.models.user import User
 
 
 class ConversationRole(StrEnum):

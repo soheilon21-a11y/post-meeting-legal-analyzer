@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import asyncio
-from uuid import uuid4
 
-from app.api.v1.analyses import analyze, AnalyzeRequest
+from app.api.v1.analyses import AnalyzeRequest
+from app.api.v1.analyses import analyze
 
 
 async def test_fallback_when_ollama_fails() -> None:
@@ -27,7 +27,10 @@ async def test_fallback_when_ollama_fails() -> None:
 
 async def test_rule_based_direct() -> None:
     request = AnalyzeRequest(
-        text="Alice agreed to prepare the revised wording by Friday. Bob is responsible for the review.",
+        text=(
+            "Alice agreed to prepare the revised wording by Friday. "
+            "Bob is responsible for the review."
+        ),
         use_llm=False,
     )
     response = await analyze(request)

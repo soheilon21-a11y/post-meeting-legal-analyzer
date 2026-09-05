@@ -1,13 +1,18 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING
 from uuid import uuid4
 
-from fastapi import Request
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.responses import Response
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import RequestResponseEndpoint
 
-from app.core.logging import bind_context, get_logger, unbind_context
+from app.core.logging import bind_context
+from app.core.logging import get_logger
+from app.core.logging import unbind_context
+
+if TYPE_CHECKING:
+    from fastapi import Request
+    from starlette.responses import Response
 
 logger = get_logger(__name__)
 

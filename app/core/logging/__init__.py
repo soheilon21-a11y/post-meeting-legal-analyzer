@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import logging
 import sys
-from collections.abc import MutableMapping
 from typing import Any
 
 import structlog
 
-from app.core.config.settings import LoggingSettings, get_settings
+from app.core.config.settings import LoggingSettings
+from app.core.config.settings import get_settings
 
 
 def configure_logging(settings: LoggingSettings | None = None) -> None:

@@ -1,19 +1,21 @@
 from __future__ import annotations
 
-from uuid import UUID
+from typing import TYPE_CHECKING
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.db.models.document import (
-    Document,
-    DocumentSegment,
-    DocumentType,
-    DocumentVersion,
-    ProcessingStatus,
-)
+from app.db.models.document import Document
+from app.db.models.document import DocumentSegment
+from app.db.models.document import DocumentType
+from app.db.models.document import DocumentVersion
+from app.db.models.document import ProcessingStatus
 from app.infrastructure.database.repositories.base import SQLRepository
+
+if TYPE_CHECKING:
+    from uuid import UUID
+
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class DocumentRepository(SQLRepository[Document]):

@@ -10,7 +10,10 @@ class AppError(Exception):
 
 class NotFoundError(AppError):
     def __init__(self, entity: str, identifier: str) -> None:
-        super().__init__(message=f"{entity} not found", detail=f"{entity} with id '{identifier}' not found")
+        super().__init__(
+            message=f"{entity} not found",
+            detail=f"{entity} with id '{identifier}' not found",
+        )
 
 
 class UnauthorizedError(AppError):

@@ -1,38 +1,36 @@
 import asyncio
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from alembic import context
 from app.core.config.settings import get_settings
 from app.db.base import Base
 
 # Import all models so Alembic can detect them for autogenerate
-from app.db.models import (  # noqa: F401
-    AIJob,
-    Analysis,
-    AnalysisItem,
-    AuditEvent,
-    Citation,
-    Conversation,
-    ConversationMessage,
-    Document,
-    DocumentSegment,
-    DocumentVersion,
-    Embedding,
-    Matter,
-    MatterMember,
-    Meeting,
-    ModelRun,
-    Organization,
-    PromptVersion,
-    RedlineChange,
-    RedlineJob,
-    TranscriptSegment,
-    User,
-)
+from app.db.models import AIJob  # noqa: F401
+from app.db.models import Analysis  # noqa: F401
+from app.db.models import AnalysisItem  # noqa: F401
+from app.db.models import AuditEvent  # noqa: F401
+from app.db.models import Citation  # noqa: F401
+from app.db.models import Conversation  # noqa: F401
+from app.db.models import ConversationMessage  # noqa: F401
+from app.db.models import Document  # noqa: F401
+from app.db.models import DocumentSegment  # noqa: F401
+from app.db.models import DocumentVersion  # noqa: F401
+from app.db.models import Embedding  # noqa: F401
+from app.db.models import Matter  # noqa: F401
+from app.db.models import MatterMember  # noqa: F401
+from app.db.models import Meeting  # noqa: F401
+from app.db.models import ModelRun  # noqa: F401
+from app.db.models import Organization  # noqa: F401
+from app.db.models import PromptVersion  # noqa: F401
+from app.db.models import RedlineChange  # noqa: F401
+from app.db.models import RedlineJob  # noqa: F401
+from app.db.models import TranscriptSegment  # noqa: F401
+from app.db.models import User  # noqa: F401
 
 config = context.config
 

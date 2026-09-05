@@ -49,10 +49,13 @@ class LifecycleManager:
             logger.warning("postgres_connection_failed", error=str(exc))
 
     async def _check_qdrant(self) -> None:
+        settings = get_settings().qdrant
+        if settings.local_path:
+            logger.info("qdrant_local_mode", path=settings.local_path)
+            return
         try:
             import httpx
 
-            settings = get_settings().qdrant
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{settings.url}/health", timeout=5.0)
                 response.raise_for_status()
@@ -78,9 +81,7 @@ class LifecycleManager:
 
             settings = get_settings().ollama
             async with httpx.AsyncClient() as client:
-                response = await client.get(
-                    f"{settings.base_url}/api/tags", timeout=5.0
-                )
+                response = await client.get(f"{settings.base_url}/api/tags", timeout=5.0)
                 response.raise_for_status()
             logger.info("ollama_connected", host=settings.base_url)
         except Exception as exc:

@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
+from pydantic_settings import SettingsConfigDict
+
+_ENV_FILE = Path(__file__).resolve().parents[3] / ".env"
 
 
 class PostgresSettings(BaseSettings):
@@ -32,13 +37,39 @@ class PostgresSettings(BaseSettings):
 
 
 class QdrantSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="QDRANT_")
+    model_config = SettingsConfigDict(
+        env_file=_ENV_FILE,
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
-    host: str = Field(default="localhost")
-    port: int = Field(default=6333)
-    grpc_port: int = Field(default=6334)
-    api_key: str | None = Field(default=None)
-    collection_prefix: str = Field(default="legal_")
+    QDRANT_HOST: str = Field(default="localhost")
+    QDRANT_PORT: int = Field(default=6333)
+    QDRANT_GRPC_PORT: int = Field(default=6334)
+    QDRANT_API_KEY: str | None = Field(default=None)
+    QDRANT_COLLECTION_PREFIX: str = Field(default="legal_")
+    QDRANT_LOCAL_PATH: str | None = Field(default=None)
+
+    @property
+    def host(self) -> str:
+        return self.QDRANT_HOST
+
+    @property
+    def port(self) -> int:
+        return self.QDRANT_PORT
+
+    @property
+    def grpc_port(self) -> int:
+        return self.QDRANT_GRPC_PORT
+
+    @property
+    def collection_prefix(self) -> str:
+        return self.QDRANT_COLLECTION_PREFIX
+
+    @property
+    def local_path(self) -> str | None:
+        return self.QDRANT_LOCAL_PATH
 
     @property
     def url(self) -> str:
@@ -61,7 +92,13 @@ class RedisSettings(BaseSettings):
 
 
 class OllamaSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="OLLAMA_")
+    model_config = SettingsConfigDict(
+        env_prefix="OLLAMA_",
+        env_file=_ENV_FILE,
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
     host: str = Field(default="http://localhost:11434")
     default_model: str = Field(default="llama3.2")
@@ -146,7 +183,7 @@ class AiSettings(BaseSettings):
     rerank_top_k: int = Field(default=8, ge=1, le=50)
     max_context_tokens: int = Field(default=8192, ge=512, le=32768)
     embedding_dimension: int = Field(default=768, ge=128)
-    vector_similarity_threshold: float = Field(default=0.65, ge=0.0, le=1.0)
+    vector_similarity_threshold: float = Field(default=0.35, ge=0.0, le=1.0)
 
 
 class LoggingSettings(BaseSettings):
@@ -166,7 +203,7 @@ class MetricsSettings(BaseSettings):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=_ENV_FILE,
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",

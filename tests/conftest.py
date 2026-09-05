@@ -1,12 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING
 
 import pytest
 import pytest_asyncio
-from httpx import ASGITransport, AsyncClient
+from httpx import ASGITransport
+from httpx import AsyncClient
 
-from app.core.config import Settings, get_settings
+from app.core.config import Settings
+from app.core.config import get_settings
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 
 @pytest.fixture(scope="session")

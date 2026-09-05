@@ -1,12 +1,22 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from typing import TYPE_CHECKING
 
-from sqlalchemy import String, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
-from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.base import SoftDeleteMixin
+from app.db.base import TimestampMixin
+from app.db.base import UUIDMixin
+
+if TYPE_CHECKING:
+    from app.db.models.audit import AuditEvent
+    from app.db.models.matter import Matter
+    from app.db.models.user import User
 
 
 class Organization(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):

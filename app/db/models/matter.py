@@ -3,11 +3,34 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import DateTime
+from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
+from sqlalchemy import String
+from sqlalchemy import Text
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
-from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from app.db.base import Base
+from app.db.base import SoftDeleteMixin
+from app.db.base import TimestampMixin
+from app.db.base import UUIDMixin
+
+if TYPE_CHECKING:
+    import uuid
+    from datetime import datetime
+
+    from app.db.models.ai_job import AIJob
+    from app.db.models.analysis import Analysis
+    from app.db.models.conversation import Conversation
+    from app.db.models.document import Document
+    from app.db.models.meeting import Meeting
+    from app.db.models.organization import Organization
+    from app.db.models.redline import RedlineJob
+    from app.db.models.user import User
 
 
 class MatterStatus(StrEnum):
@@ -99,4 +122,7 @@ class MatterMember(Base, UUIDMixin, TimestampMixin):
     user: Mapped[User] = relationship("User", back_populates="matter_memberships", lazy="selectin")
 
     def __repr__(self) -> str:
-        return f"<MatterMember matter_id={self.matter_id} user_id={self.user_id} role={self.role!r}>"
+        return (
+            f"<MatterMember matter_id={self.matter_id} "
+            f"user_id={self.user_id} role={self.role!r}>"
+        )
