@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "post-meeting-legal-analyzer"
-version = "0.1.0"
+version = "1.0.0"
 description = "Privacy-first LegalTech platform for analyzing legal meeting outputs using local AI"
 readme = "README.md"
 license = { text = "MIT" }
