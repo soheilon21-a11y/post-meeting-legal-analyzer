@@ -44,8 +44,8 @@ def create_app() -> FastAPI:
             "Privacy-first LegalTech platform for analyzing legal meeting "
             "outputs using local AI"
         ),
-        docs_url="/docs" if settings.app.debug else None,
-        redoc_url="/redoc" if settings.app.debug else None,
+        docs_url="/docs",
+        redoc_url="/redoc",
         lifespan=_lifespan,
     )
 
