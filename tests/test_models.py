@@ -4,7 +4,6 @@ import uuid
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.db.base import Base
@@ -33,12 +32,21 @@ async def db_session() -> AsyncSession:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    async with session_factory() as session:
-        yield session
-
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+    # Run each test inside an outer transaction and roll it back, so the
+    # dev database is never destroyed (previously teardown called
+    # Base.metadata.drop_all, wiping all real data on every suite run).
+    async with engine.connect() as conn:
+        transaction = await conn.begin()
+        session = AsyncSession(
+            bind=conn,
+            expire_on_commit=False,
+            join_transaction_mode="create_savepoint",
+        )
+        try:
+            yield session
+        finally:
+            await session.close()
+            await transaction.rollback()
     await engine.dispose()
 
 

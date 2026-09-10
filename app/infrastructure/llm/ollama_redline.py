@@ -132,16 +132,22 @@ difference in the supplied context.
 Required fields: clause_path, change_type, original_text, proposed_text,
 rationale (max 1 sentence), risk_level (low|medium|high), confidence (0.0-1.0),
 and citations.
-original_text MUST be a non-empty full sentence copied exactly and verbatim
-from one supplied CONTEXT segment.
+original_text MUST be one or more complete sentences copied as a single
+contiguous substring from exactly one supplied CONTEXT segment — byte for
+byte, no paraphrasing, no re-casing, no added or removed punctuation, no
+ellipses, no joining text from two segments. When a BASE document segment
+is supplied, take original_text from it.
 proposed_text MUST be non-empty, materially revise that exact sentence, and
-differ from original_text by at least one word.
+differ from original_text by at least one word. When a COMPARISON document
+segment is supplied, proposed_text SHOULD reflect its language.
 proposed_text MUST NOT be copied verbatim from any supplied CONTEXT segment.
 citations MUST contain exactly one citation.
 citation.quote MUST equal original_text exactly, character-for-character.
-citation.source_id MUST be the label of the CONTEXT segment containing original_text.
-Never leave original_text, proposed_text, or citation.quote empty; never paraphrase original_text.
-If these requirements cannot all be satisfied, return {"changes":[]}.
+citation.source_id MUST be the label of the CONTEXT segment containing
+original_text (e.g. "BASE document" or "CONTEXT 2").
+Never leave original_text, proposed_text, or citation.quote empty; never
+paraphrase original_text. If no sentence can be quoted exactly as required,
+return {"changes":[]}.
 Return only the JSON object, with no markdown or explanatory text.
 """
         return prompt
