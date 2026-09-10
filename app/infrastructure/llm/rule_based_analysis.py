@@ -102,7 +102,7 @@ class RuleBasedAnalysisGeneration(AnalysisGenerationPort):
                 seen_titles.add(title)
                 evidence = (
                     EvidenceInput(
-                        source_id="rule_based",
+                        source_id="transcript",
                         quote=f"Matched pattern: {pattern}",
                     ),
                 )

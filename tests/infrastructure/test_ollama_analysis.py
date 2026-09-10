@@ -8,6 +8,7 @@ import pytest
 
 from app.application.dtos.internal.analysis_generation import AnalysisGenerationInput
 from app.application.dtos.internal.analysis_generation import AnalysisGenerationResult
+from app.application.dtos.internal.analysis_generation import EvidenceInput
 from app.application.exceptions.processing import ProcessingError
 from app.infrastructure.llm.ollama_analysis import OllamaAnalysisGeneration
 
@@ -189,4 +190,67 @@ async def test_adapter_adds_fallback_evidence_when_risk_has_none() -> None:
     )
     result = await adapter.generate(request)
     assert len(result.risks[0].evidence) == 1
-    assert result.risks[0].evidence[0].source_id == "analysis"
+    assert result.risks[0].evidence[0].source_id == "transcript"
+
+
+@pytest.mark.anyio
+async def test_prompt_labels_corpus_evidence_with_source_id() -> None:
+    fake = FakeOllamaClient(
+        '{"summary": "Test.", "risks": [], "obligations": [], "action_items": []}'
+    )
+    adapter = OllamaAnalysisGeneration(model_name="test-model", base_url="http://test")
+    adapter._client = fake  # type: ignore[attr-defined]
+
+    request = AnalysisGenerationInput(
+        analysis_id=uuid4(),
+        meeting_id=uuid4(),
+        transcript="We discussed payment terms.",
+        evidence=(
+            EvidenceInput("contract-1", "Payment terms were changed to 45 days."),
+        ),
+        analysis_type="full_meeting",
+    )
+    await adapter.generate(request)
+
+    prompt = fake.calls[0]["messages"][0]["content"]
+    assert "[Source: contract-1] Payment terms were changed to 45 days." in prompt
+    assert '"contract-1"' in prompt
+
+
+@pytest.mark.anyio
+async def test_corpus_source_id_citation_is_kept_and_invented_id_dropped() -> None:
+    json_text = """{
+  "summary": "Payment window extended.",
+  "risks": [
+    {
+      "title": "Payment term mismatch",
+      "description": "Transcript says 30 days but contract says 45.",
+      "level": "medium",
+      "confidence": 0.9,
+      "evidence": [
+        {"source_id": "transcript", "quote": "Payment is due in 30 days."},
+        {"source_id": "contract-1", "quote": "Payment terms were changed to 45 days."},
+        {"source_id": "additional_evidence", "quote": "invented"}
+      ]
+    }
+  ],
+  "obligations": [],
+  "action_items": []
+}"""
+    adapter = OllamaAnalysisGeneration(model_name="test-model", base_url="http://test")
+    adapter._client = FakeOllamaClient(json_text)  # type: ignore[attr-defined]
+
+    request = AnalysisGenerationInput(
+        analysis_id=uuid4(),
+        meeting_id=uuid4(),
+        transcript="Payment is due in 30 days.",
+        evidence=(
+            EvidenceInput("contract-1", "Payment terms were changed to 45 days."),
+        ),
+        analysis_type="full_meeting",
+    )
+    result = await adapter.generate(request)
+
+    source_ids = {e.source_id for e in result.risks[0].evidence}
+    assert source_ids == {"transcript", "contract-1"}
+    assert "additional_evidence" not in source_ids

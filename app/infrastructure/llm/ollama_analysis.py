@@ -59,13 +59,35 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
                 "Ollama returned empty content",
             )
 
-        return self._parse_result(content)
+        allowed_source_ids = {"transcript"} | {
+            e.source_id for e in request.evidence if e.source_id
+        }
+        return self._parse_result(content, allowed_source_ids)
 
     def _build_prompt(self, request: AnalysisGenerationInput) -> str:
         evidence_text = ""
+        citation_rules = (
+            "- Every risk, obligation, and action item must include at least one evidence "
+            'entry with a "source_id" and a verbatim "quote".\n'
+            '- Cite "transcript" only for statements made in the transcript itself.\n'
+        )
         if request.evidence:
-            evidence_text = "\n\nADDITIONAL EVIDENCE:\n" + "\n".join(
-                f"- {e.quote}" for e in request.evidence
+            evidence_text = (
+                "\n\nRETRIEVED CORPUS EVIDENCE (from indexed matter documents, each labeled "
+                "with its source_id):\n"
+                + "\n".join(f"[Source: {e.source_id}] {e.quote}" for e in request.evidence)
+            )
+            corpus_ids = ", ".join(
+                f'"{source_id}"'
+                for source_id in dict.fromkeys(e.source_id for e in request.evidence)
+            )
+            citation_rules += (
+                "- When a finding is supported by corpus evidence, its evidence entry must "
+                "cite the exact source_id of the supporting document. "
+                f"Allowed corpus source_ids: {corpus_ids}.\n"
+                "- When both the transcript and a corpus document support a finding, "
+                "cite both source_ids in separate evidence entries.\n"
+                "- Never invent source_ids or reuse section labels as source_ids.\n"
             )
 
         return (
@@ -82,7 +104,8 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
             '      "description": "Detailed description",\n'
             '      "level": "low|medium|high|critical",\n'
             '      "confidence": 0.85,\n'
-            '      "evidence": [{"source_id": "transcript", "quote": "relevant quote"}]\n'
+            '      "evidence": [{"source_id": "transcript or a corpus source_id", '
+            '"quote": "relevant quote"}]\n'
             "    }\n"
             "  ],\n"
             '  "obligations": [\n'
@@ -91,7 +114,8 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
             '      "description": "Detailed description",\n'
             '      "responsible_party": "Who is responsible",\n'
             '      "confidence": 0.80,\n'
-            '      "evidence": [{"source_id": "transcript", "quote": "relevant quote"}],\n'
+            '      "evidence": [{"source_id": "transcript or a corpus source_id", '
+            '"quote": "relevant quote"}],\n'
             '      "due_date": "YYYY-MM-DD" or null\n'
             "    }\n"
             "  ],\n"
@@ -101,7 +125,8 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
             '      "description": "Detailed description",\n'
             '      "responsible_party": "Who should act",\n'
             '      "confidence": 0.80,\n'
-            '      "evidence": [{"source_id": "transcript", "quote": "relevant quote"}],\n'
+            '      "evidence": [{"source_id": "transcript or a corpus source_id", '
+            '"quote": "relevant quote"}],\n'
             '      "due_date": "YYYY-MM-DD" or null\n'
             "    }\n"
             "  ]\n"
@@ -109,12 +134,17 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
             "Rules:\n"
             '- "level" must be exactly one of: low, medium, high, critical\n'
             '- "confidence" must be a float between 0.0 and 1.0\n'
+            f"{citation_rules}"
             "- If a category has no entries, return an empty array []\n"
             "- Do not wrap the JSON in markdown code fences\n"
             "- Return only raw JSON\n"
         )
 
-    def _parse_result(self, content: str) -> AnalysisGenerationResult:
+    def _parse_result(
+        self,
+        content: str,
+        allowed_source_ids: set[str] | frozenset[str],
+    ) -> AnalysisGenerationResult:
         try:
             data = json.loads(content)
         except json.JSONDecodeError as exc:
@@ -124,9 +154,9 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
             ) from exc
 
         summary = data.get("summary", "")
-        risks = self._parse_risks(data.get("risks", []))
-        obligations = self._parse_obligations(data.get("obligations", []))
-        action_items = self._parse_action_items(data.get("action_items", []))
+        risks = self._parse_risks(data.get("risks", []), allowed_source_ids)
+        obligations = self._parse_obligations(data.get("obligations", []), allowed_source_ids)
+        action_items = self._parse_action_items(data.get("action_items", []), allowed_source_ids)
 
         return AnalysisGenerationResult(
             summary=summary,
@@ -135,15 +165,19 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
             action_items=action_items,
         )
 
-    def _parse_risks(self, items: list[dict[str, Any]]) -> tuple[GeneratedRisk, ...]:
+    def _parse_risks(
+        self,
+        items: list[dict[str, Any]],
+        allowed_source_ids: set[str] | frozenset[str],
+    ) -> tuple[GeneratedRisk, ...]:
         result: list[GeneratedRisk] = []
         for idx, item in enumerate(items):
-            evidence = self._parse_evidence(item.get("evidence", []))
+            evidence = self._parse_evidence(item.get("evidence", []), allowed_source_ids)
             # Ensure at least one evidence entry so domain invariants are satisfied
             if not evidence:
                 evidence = (
                     EvidenceInput(
-                        source_id="analysis",
+                        source_id="transcript",
                         quote="Derived from meeting transcript.",
                     ),
                 )
@@ -164,14 +198,18 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
                 ) from exc
         return tuple(result)
 
-    def _parse_obligations(self, items: list[dict[str, Any]]) -> tuple[GeneratedObligation, ...]:
+    def _parse_obligations(
+        self,
+        items: list[dict[str, Any]],
+        allowed_source_ids: set[str] | frozenset[str],
+    ) -> tuple[GeneratedObligation, ...]:
         result: list[GeneratedObligation] = []
         for idx, item in enumerate(items):
-            evidence = self._parse_evidence(item.get("evidence", []))
+            evidence = self._parse_evidence(item.get("evidence", []), allowed_source_ids)
             if not evidence:
                 evidence = (
                     EvidenceInput(
-                        source_id="analysis",
+                        source_id="transcript",
                         quote="Derived from meeting transcript.",
                     ),
                 )
@@ -194,10 +232,14 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
                 ) from exc
         return tuple(result)
 
-    def _parse_action_items(self, items: list[dict[str, Any]]) -> tuple[GeneratedActionItem, ...]:
+    def _parse_action_items(
+        self,
+        items: list[dict[str, Any]],
+        allowed_source_ids: set[str] | frozenset[str],
+    ) -> tuple[GeneratedActionItem, ...]:
         result: list[GeneratedActionItem] = []
         for idx, item in enumerate(items):
-            evidence = self._parse_evidence(item.get("evidence", []))
+            evidence = self._parse_evidence(item.get("evidence", []), allowed_source_ids)
             due_date = self._parse_optional_date(item.get("due_date"))
             try:
                 result.append(
@@ -218,12 +260,18 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
         return tuple(result)
 
     @staticmethod
-    def _parse_evidence(items: list[dict[str, Any]]) -> tuple[EvidenceInput, ...]:
+    def _parse_evidence(
+        items: list[dict[str, Any]],
+        allowed_source_ids: set[str] | frozenset[str],
+    ) -> tuple[EvidenceInput, ...]:
         result: list[EvidenceInput] = []
         for item in items:
+            source_id = str(item.get("source_id", ""))
+            if source_id not in allowed_source_ids:
+                continue
             result.append(
                 EvidenceInput(
-                    source_id=item.get("source_id", ""),
+                    source_id=source_id,
                     quote=item.get("quote", ""),
                     page_number=item.get("page_number"),
                     start_offset=item.get("start_offset"),
