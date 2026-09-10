@@ -72,6 +72,10 @@ class QdrantSettings(BaseSettings):
         return self.QDRANT_LOCAL_PATH
 
     @property
+    def api_key(self) -> str | None:
+        return self.QDRANT_API_KEY or None
+
+    @property
     def url(self) -> str:
         return f"http://{self.host}:{self.port}"
 
