@@ -106,6 +106,16 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
             '      "confidence": 0.85,\n'
             '      "evidence": [{"source_id": "transcript or a corpus source_id", '
             '"quote": "relevant quote"}]\n'
+            "    },\n"
+            "    {\n"
+            '      "title": "Liability cap exposes buyer",\n'
+            '      "description": "Risk FOR THE CLIENT (the buyer): the contract caps '
+            'liability at direct damages, so the client cannot recover consequential '
+            'losses.",\n'
+            '      "level": "high",\n'
+            '      "confidence": 0.9,\n'
+            '      "evidence": [{"source_id": "a corpus source_id", "quote": '
+            '"relevant quote from the retrieved document"}]\n'
             "    }\n"
             "  ],\n"
             '  "obligations": [\n'
@@ -135,6 +145,16 @@ class OllamaAnalysisGeneration(AnalysisGenerationPort):
             '- "level" must be exactly one of: low, medium, high, critical\n'
             '- "confidence" must be a float between 0.0 and 1.0\n'
             f"{citation_rules}"
+            "- Analyze the situation from the perspective of the party hosting the meeting "
+            "(the client side). Every risk must state whose interest is harmed.\n"
+            "- COVERAGE RULE: every distinct topic that any speaker explicitly raised in "
+            "the transcript MUST appear in the output — as a risk, obligation, or action "
+            "item. If a topic was flagged in the meeting as a concern (e.g. 'we will flag "
+            "it as a risk'), it MUST become a risk item, even if the contract is silent on "
+            "it. A topic being absent from the contract while discussed in the meeting is "
+            "itself reportable.\n"
+            "- When the retrieved contract evidence addresses the same topic as the "
+            "transcript, state in the description whether the terms match or differ.\n"
             "- If a category has no entries, return an empty array []\n"
             "- Do not wrap the JSON in markdown code fences\n"
             "- Return only raw JSON\n"
