@@ -60,7 +60,7 @@ async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
         UnsupportedFileTypeError: HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
         FileTooLargeError: HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
         ProcessingNotCompleteError: HTTPStatus.ACCEPTED,
-        TokenBudgetExceededError: HTTPStatus.PAYLOAD_TOO_LARGE,
+        TokenBudgetExceededError: HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
     }
 
     status_code = status_map.get(type(exc), HTTPStatus.INTERNAL_SERVER_ERROR)
