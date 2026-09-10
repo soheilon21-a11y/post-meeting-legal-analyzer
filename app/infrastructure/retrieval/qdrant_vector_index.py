@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import threading
 import uuid
 from typing import TYPE_CHECKING
@@ -14,6 +15,8 @@ from app.core.config import get_settings
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+logger = logging.getLogger(__name__)
 
 _client_cache: dict[str, Any] = {}
 _cache_lock = threading.Lock()
@@ -37,8 +40,14 @@ def build_qdrant_client() -> Any:
         client = _client_cache.get(key)
         if client is None:
             if settings.local_path:
+                logger.warning(
+                    "Qdrant EMBEDDED mode in use (path=%s); server at %s is IGNORED",
+                    settings.local_path,
+                    settings.url,
+                )
                 client = QdrantClient(path=settings.local_path)
             else:
+                logger.info("Qdrant SERVER mode: %s", settings.url)
                 client = QdrantClient(
                     host=settings.host,
                     port=settings.port,
