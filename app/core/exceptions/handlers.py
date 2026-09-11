@@ -17,6 +17,7 @@ from app.core.exceptions.domain import UnauthorizedError
 from app.core.exceptions.domain import UnsupportedFileTypeError
 from app.core.exceptions.domain import ValidationError
 from app.core.logging import get_logger
+from app.core.security.tokens import InvalidTokenError
 
 if TYPE_CHECKING:
     from fastapi import Request
@@ -74,6 +75,17 @@ async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
         detail=exc.detail,
         instance=str(request.url),
     )
+
+
+async def invalid_token_handler(request: Request, exc: InvalidTokenError) -> JSONResponse:
+    response = _problem_response(
+        status=HTTPStatus.UNAUTHORIZED,
+        title="Unauthorized",
+        detail="Token is invalid or expired",
+        instance=str(request.url),
+    )
+    response.headers["WWW-Authenticate"] = "Bearer"
+    return response
 
 
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:

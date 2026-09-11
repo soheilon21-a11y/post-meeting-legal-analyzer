@@ -16,8 +16,10 @@ from app.core.config import get_settings
 from app.core.exceptions.domain import AppError
 from app.core.exceptions.handlers import app_error_handler
 from app.core.exceptions.handlers import generic_exception_handler
+from app.core.exceptions.handlers import invalid_token_handler
 from app.core.lifecycle.manager import LifecycleManager
 from app.core.logging import configure_logging
+from app.core.security.tokens import InvalidTokenError
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -75,6 +77,7 @@ def _configure_middleware(app: FastAPI) -> None:
 def _configure_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, app_error_handler)
     app.add_exception_handler(ApplicationError, _application_error_handler)
+    app.add_exception_handler(InvalidTokenError, invalid_token_handler)
     app.add_exception_handler(Exception, generic_exception_handler)
 
 
