@@ -3,16 +3,23 @@ from __future__ import annotations
 from datetime import UTC
 from datetime import datetime
 from typing import TYPE_CHECKING
+from uuid import UUID  # noqa: TC003 -- FastAPI evaluates path annotations at runtime
 
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import Path
+from fastapi import Response
+from fastapi import status
 from pydantic import BaseModel
 
 from app.api.dependencies.audit import get_audit_dispatcher
+from app.api.dependencies.db import get_db
 from app.application.exceptions.processing import ProcessingError
 from app.application.mappers.analysis import DefaultAnalysisMapper
 from app.application.services.analysis_service import AnalysisApplicationService
 from app.core.config import get_settings
+from app.db.models.analysis import Analysis
 from app.domain.analysis.entities import LegalAnalysis
 from app.domain.analysis.enums import AnalysisType
 from app.domain.meeting.entities import Meeting
@@ -22,11 +29,14 @@ from app.domain.meeting.value_objects import MeetingTitle
 from app.infrastructure.embeddings import OllamaEmbeddings
 from app.infrastructure.llm import OllamaAnalysisGeneration
 from app.infrastructure.llm import RuleBasedAnalysisGeneration
+from app.infrastructure.reporting.analysis_report_pdf import render_analysis_report_pdf
 from app.infrastructure.retrieval import EmbeddedRetrieval
 from app.infrastructure.retrieval import NoOpRetrieval
 from app.infrastructure.retrieval import QdrantVectorIndex
 
 if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
+
     from app.application.dtos.responses.analysis_responses import AnalysisResponse
     from app.application.ports.rag_retrieval import RetrievalPort
     from app.domain.ports.event_dispatcher import EventDispatcher
@@ -124,3 +134,34 @@ async def analyze(
 
     mapper = DefaultAnalysisMapper()
     return mapper.to_response(analysis)
+
+
+@router.get(
+    "/analyses/{analysis_id}/report",
+    response_class=Response,
+    summary="Download the analysis result as a PDF report",
+)
+async def get_analysis_report(
+    analysis_id: UUID = Path(..., description="The analysis UUID"),
+    session: AsyncSession = Depends(get_db),
+) -> Response:
+    """Render a completed analysis as a professional, downloadable PDF.
+
+    Loads the ``Analysis`` row (with its items and citations) from
+    PostgreSQL via the shared ORM models and returns a deliverable-style
+    report: summary, risks/obligations/action-item tables, and verbatim
+    citation footnotes distinguishing meeting-transcript evidence from
+    corpus sources.  Unknown analysis ids yield a 404.
+    """
+    analysis = await session.get(Analysis, analysis_id)
+    if analysis is None:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            f"Analysis {analysis_id} not found",
+        )
+    pdf_bytes = render_analysis_report_pdf(analysis)
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": 'attachment; filename="analysis-report.pdf"'},
+    )

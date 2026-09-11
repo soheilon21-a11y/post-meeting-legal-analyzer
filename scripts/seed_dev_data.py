@@ -11,9 +11,15 @@ no-op that only prints the current ids):
 Usage:
     python scripts/seed_dev_data.py
 
-    # mint a token whose subject resolves by display_name / org name:
+    # mint a dev token using the UUIDs printed above (NOT the handle names):
+    # the audit dispatcher on POST /api/v1/analyze requires org_id and sub to
+    # be valid UUID strings, so a token like ('test-user-1','org-1') returns
+    # 401 there.  Redline endpoints additionally accept the handles ('test-user-1',
+    # 'matter-1') because they resolve them against the database.
     python -c "from app.core.security.tokens import TokenService; \\
-print(TokenService().create_access_token('test-user-1','org-1'))"
+print(TokenService().create_access_token('<user_uuid>', '<org_uuid>'))"
+    # e.g. create_access_token('e6d0bb00-...', '8a6dc3b3-...') with the
+    # organization_id/user_id values printed by this script.
 
     # create a redline job (matter resolved by matter_number):
     curl -X POST http://localhost:8000/api/v1/redlines/ -H "Authorization: Bearer <token>" \\

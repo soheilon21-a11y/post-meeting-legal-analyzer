@@ -3,11 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
+from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
 
 from app.api.dependencies.audit import get_audit_dispatcher
+from app.core.security.tokens import TokenService
 from app.main import create_app
 
 if TYPE_CHECKING:
@@ -144,3 +146,41 @@ def test_analyze_endpoint_no_duplicate_dispatch(client):
     assert response.status_code == 200
     for count in dispatch_counts.values():
         assert count == 1, f"Event dispatched {count} times instead of 1"
+
+
+def _post_analyze(client: TestClient, token: str):
+    return client.post(
+        "/api/v1/analyze",
+        json={"text": "Test meeting", "use_llm": False},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+
+def test_analyze_endpoint_rejects_non_uuid_org_claim_with_401(client):
+    """Regression: handle-style org claim ('org-1') must 401, never 500."""
+    token = TokenService().create_access_token(str(uuid4()), "org-1")
+
+    response = _post_analyze(client, token)
+
+    assert response.status_code == 401, response.text
+    assert "Invalid organization claim in token" in response.json()["detail"]
+
+
+def test_analyze_endpoint_rejects_missing_org_claim_with_401(client):
+    """A decodable token without any org_id claim is a malformed context."""
+    token = TokenService().create_access_token(str(uuid4()))
+
+    response = _post_analyze(client, token)
+
+    assert response.status_code == 401, response.text
+    assert "Invalid organization claim in token" in response.json()["detail"]
+
+
+def test_analyze_endpoint_rejects_non_uuid_subject_claim_with_401(client):
+    """Valid org UUID but handle-style subject ('test-user-1') must 401."""
+    token = TokenService().create_access_token("test-user-1", str(uuid4()))
+
+    response = _post_analyze(client, token)
+
+    assert response.status_code == 401, response.text
+    assert "Invalid subject claim in token" in response.json()["detail"]
