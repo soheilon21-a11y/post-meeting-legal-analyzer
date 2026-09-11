@@ -150,7 +150,8 @@ class Citation(Base, UUIDMixin):
         ForeignKey("analysis_items.id", ondelete="SET NULL"), default=None, nullable=True
     )
     source_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    source_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
+    # String source handle ("transcript", "contract-1", ...), not a row UUID.
+    source_id: Mapped[str] = mapped_column(String(255), nullable=False)
     page_number: Mapped[int | None] = mapped_column(Integer, default=None)
     start_offset: Mapped[int | None] = mapped_column(Integer, default=None)
     end_offset: Mapped[int | None] = mapped_column(Integer, default=None)
