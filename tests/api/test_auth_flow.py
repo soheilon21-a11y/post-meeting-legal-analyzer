@@ -354,6 +354,30 @@ async def test_refresh_rejects_access_token_and_garbage(app: Any) -> None:
 
 
 @pytest.mark.anyio
+async def test_openapi_lists_all_auth_paths(app: Any) -> None:
+    """Regression: the three auth endpoints must appear in the OpenAPI schema.
+
+    Guards against silently dropping auth_router from the v1 router (the
+    symptom: Swagger has no Authorize-able /auth/login and paths vanish
+    while securitySchemes.HTTPBearer — contributed by the redline endpoints —
+    remains, as served by stale or mis-wired app instances).
+    """
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        response = await client.get("/openapi.json")
+
+    spec = response.json()
+    for path, method in (
+        ("/api/v1/auth/register", "post"),
+        ("/api/v1/auth/login", "post"),
+        ("/api/v1/auth/refresh", "post"),
+    ):
+        assert path in spec["paths"], f"{path} missing from OpenAPI schema"
+        assert method in spec["paths"][path], f"{method.upper()} {path} missing"
+
+
+@pytest.mark.anyio
 async def test_openapi_declares_httpbearer_scheme_on_protected_endpoints(app: Any) -> None:
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
