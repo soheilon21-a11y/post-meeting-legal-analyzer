@@ -9,7 +9,21 @@ from app.core.exceptions.domain import UnauthorizedError
 from app.core.security.tokens import TokenPayload
 from app.core.security.tokens import TokenService
 
-_bearer_scheme = HTTPBearer(auto_error=False)
+# Named scheme so FastAPI publishes it once under OpenAPI ``securitySchemes``
+# with a stable key: Swagger UI's Authorize button then sends
+# ``Authorization: Bearer <token>`` on every protected endpoint.  ``auto_error``
+# stays off and the raw ``authorization`` header remains as a fallback for
+# clients that set the header manually.
+bearer_scheme = HTTPBearer(
+    auto_error=False,
+    scheme_name="HTTPBearer",
+    description=(
+        "Paste the JWT from POST /api/v1/auth/login (or register/refresh). "
+        "Swagger prepends 'Bearer ' automatically."
+    ),
+)
+
+_bearer_scheme = bearer_scheme
 
 
 async def get_token_payload(

@@ -9,6 +9,9 @@ from app.db.models.audit import AuditEvent
 from app.db.models.audit import AuditEventType
 from app.domain.events.analysis_events import AnalysisApproved
 from app.domain.events.analysis_events import AnalysisReadyForReview
+from app.domain.events.auth_events import AuthLoginFailed
+from app.domain.events.auth_events import AuthLoginSuccess
+from app.domain.events.auth_events import AuthRegistered
 
 if TYPE_CHECKING:
     import uuid
@@ -17,9 +20,12 @@ if TYPE_CHECKING:
 
     from app.domain.shared.domain_event import DomainEvent
 
-_EVENT_TYPE_MAP: dict[type[DomainEvent], AuditEventType] = {
-    AnalysisReadyForReview: AuditEventType.ANALYSIS_REQUEST,
-    AnalysisApproved: AuditEventType.ANALYSIS_APPROVE,
+_EVENT_TYPE_MAP: dict[type[DomainEvent], tuple[AuditEventType, str]] = {
+    AnalysisReadyForReview: (AuditEventType.ANALYSIS_REQUEST, "analysis"),
+    AnalysisApproved: (AuditEventType.ANALYSIS_APPROVE, "analysis"),
+    AuthRegistered: (AuditEventType.AUTH_REGISTERED, "user"),
+    AuthLoginSuccess: (AuditEventType.AUTH_LOGIN_SUCCESS, "user"),
+    AuthLoginFailed: (AuditEventType.AUTH_LOGIN_FAILED, "user"),
 }
 
 
@@ -62,9 +68,10 @@ class AuditEventDispatcher:
             await self.dispatch(event)
 
     def _build_audit_record(self, event: DomainEvent) -> AuditEvent | None:
-        event_type = _EVENT_TYPE_MAP.get(type(event))
-        if event_type is None:
+        mapped = _EVENT_TYPE_MAP.get(type(event))
+        if mapped is None:
             return None
+        event_type, resource_type = mapped
 
         metadata: dict[str, Any] = {
             "event_id": str(event.event_id),
@@ -82,7 +89,7 @@ class AuditEventDispatcher:
             matter_id=self._matter_id,
             actor_id=self._actor_id,
             event_type=event_type,
-            resource_type="analysis",
+            resource_type=resource_type,
             resource_id=event.aggregate_id,
             metadata_json=metadata,
         )

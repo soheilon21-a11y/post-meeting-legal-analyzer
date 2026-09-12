@@ -23,6 +23,9 @@ if TYPE_CHECKING:
 class AuditEventType(StrEnum):
     LOGIN = "login"
     LOGOUT = "logout"
+    AUTH_REGISTERED = "auth.registered"
+    AUTH_LOGIN_SUCCESS = "auth.login_success"
+    AUTH_LOGIN_FAILED = "auth.login_failed"
     DOCUMENT_UPLOAD = "document_upload"
     DOCUMENT_DOWNLOAD = "document_download"
     DOCUMENT_DELETE = "document_delete"

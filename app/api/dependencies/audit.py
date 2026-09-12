@@ -4,18 +4,20 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from fastapi import Depends
-from fastapi.security import HTTPAuthorizationCredentials
-from fastapi.security import HTTPBearer
 
+from app.api.dependencies.auth import bearer_scheme
 from app.api.dependencies.db import get_db
 from app.core.exceptions.domain import UnauthorizedError
 from app.core.security.tokens import TokenService
 from app.infrastructure.persistence.audit_event_dispatcher import AuditEventDispatcher
 
 if TYPE_CHECKING:
+    from fastapi.security import HTTPAuthorizationCredentials
     from sqlalchemy.ext.asyncio import AsyncSession
 
-_bearer_scheme = HTTPBearer(auto_error=False)
+# Shared named HTTPBearer instance: one security scheme in the OpenAPI document,
+# so the Authorize button covers audit-dispatching endpoints too.
+_bearer_scheme = bearer_scheme
 
 
 async def get_audit_dispatcher(
