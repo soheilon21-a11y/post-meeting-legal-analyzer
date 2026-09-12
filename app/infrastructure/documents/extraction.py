@@ -11,6 +11,8 @@ _ZIP_MAGIC = b"PK\x03\x04"
 
 SUPPORTED_EXTENSIONS: tuple[str, ...] = (".pdf", ".docx", ".txt", ".md")
 
+MAX_UPLOAD_BYTES = 20 * 1024 * 1024
+
 SUPPORTED_FORMATS_HINT = "PDF (.pdf), DOCX (.docx), TXT (.txt), Markdown (.md)"
 
 _EMPTY_TEXT_DETAIL = "No extractable text — scanned/image-only files are not supported yet"

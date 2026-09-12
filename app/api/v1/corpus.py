@@ -16,13 +16,12 @@ from app.application.services.corpus_indexing import CorpusIndexingService
 from app.core.config import get_settings
 from app.core.exceptions.domain import FileTooLargeError
 from app.infrastructure.ai.tokenizers import SimpleTokenizer
+from app.infrastructure.documents.extraction import MAX_UPLOAD_BYTES
 from app.infrastructure.documents.extraction import extract_text
 from app.infrastructure.embeddings import OllamaEmbeddings
 from app.infrastructure.retrieval import QdrantVectorIndex
 
 router = APIRouter(prefix="/corpus", tags=["Corpus"])
-
-MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
 
 class IndexDocumentRequest(BaseModel):
