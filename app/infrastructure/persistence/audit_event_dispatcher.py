@@ -12,6 +12,7 @@ from app.domain.events.analysis_events import AnalysisReadyForReview
 from app.domain.events.auth_events import AuthLoginFailed
 from app.domain.events.auth_events import AuthLoginSuccess
 from app.domain.events.auth_events import AuthRegistered
+from app.infrastructure.persistence.audit_chain import append_audit_event
 
 if TYPE_CHECKING:
     import uuid
@@ -50,18 +51,21 @@ class AuditEventDispatcher:
         organization_id: uuid.UUID,
         *,
         actor_id: uuid.UUID | None = None,
+        actor_email: str | None = None,
         matter_id: uuid.UUID | None = None,
     ) -> None:
         self._session = session
         self._organization_id = organization_id
         self._actor_id = actor_id
+        self._actor_email = actor_email
         self._matter_id = matter_id
 
     async def dispatch(self, event: DomainEvent) -> None:
         audit_record = self._build_audit_record(event)
         if audit_record is not None:
-            self._session.add(audit_record)
-            await self._session.flush()
+            # append_audit_event owns add()+flush(): every persisted row is
+            # hash-chained (prev_hash/row_hash/seq) through one code path.
+            await append_audit_event(self._session, audit_record)
 
     async def dispatch_many(self, events: tuple[DomainEvent, ...]) -> None:
         for event in events:
@@ -88,6 +92,7 @@ class AuditEventDispatcher:
             organization_id=self._organization_id,
             matter_id=self._matter_id,
             actor_id=self._actor_id,
+            actor_email=self._actor_email,
             event_type=event_type,
             resource_type=resource_type,
             resource_id=event.aggregate_id,

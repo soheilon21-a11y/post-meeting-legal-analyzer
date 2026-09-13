@@ -172,8 +172,9 @@ async def test_redline_report_unknown_id_returns_404() -> None:
 
 
 @pytest.mark.anyio
-async def test_redline_report_without_auth_returns_401() -> None:
+async def test_redline_report_without_token_returns_pdf() -> None:
+    """Phase 1: the report endpoint works tokenless (reads write no audit)."""
     response = await _get_report(_sample_job(), JOB_ID, auth=False)
 
-    assert response.status_code == 401, response.text
-    assert response.json()["status"] == 401
+    assert response.status_code == 200, response.text
+    assert response.content[:4] == b"%PDF"

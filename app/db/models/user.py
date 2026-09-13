@@ -35,6 +35,9 @@ class User(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     display_name: Mapped[str] = mapped_column(String(255), nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    # Soft-delete flag: accounts are flagged, never hard-deleted, so audit
+    # attribution (actor_id + the actor_email snapshot) survives removal.
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
 
     organization: Mapped[Organization] = relationship(

@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.middleware.audit import AuditMiddleware
+from app.api.middleware.host_allowlist import HostAllowlistMiddleware
 from app.api.middleware.request_id import RequestIdMiddleware
 from app.api.middleware.timing import TimingMiddleware
 from app.api.v1.router import v1_router
@@ -72,6 +73,9 @@ def _configure_middleware(app: FastAPI) -> None:
     app.add_middleware(RequestIdMiddleware)
     app.add_middleware(AuditMiddleware)
     app.add_middleware(TimingMiddleware)
+    # Added last → outermost layer: hostile Host headers are rejected before
+    # any other middleware or routing work happens.
+    app.add_middleware(HostAllowlistMiddleware)
 
 
 def _configure_exception_handlers(app: FastAPI) -> None:

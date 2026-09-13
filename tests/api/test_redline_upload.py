@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 from uuid import UUID
+from uuid import uuid4
 
 import pytest
 from docx import Document as DocxDocument
@@ -15,11 +16,17 @@ from reportlab.pdfgen import canvas
 
 from app.api.dependencies.db import get_db
 from app.core.security.tokens import TokenService
+from app.db.models import AuditEvent
 from app.db.models import Document
 from app.db.models import DocumentSegment
 from app.db.models import DocumentVersion
+from app.db.models import Matter
+from app.db.models import MatterClassification
+from app.db.models import MatterMember
 from app.db.models import MatterMemberRole
+from app.db.models import MatterStatus
 from app.db.models import RedlineJob
+from app.db.models import User
 from app.infrastructure.documents.extraction import MAX_UPLOAD_BYTES
 from app.main import create_app
 
@@ -28,6 +35,7 @@ if TYPE_CHECKING:
 
 MATTER_ID = UUID("11111111-1111-1111-1111-111111111111")
 USER_ID = UUID("22222222-2222-2222-2222-222222222222")
+ORG_ID = UUID("33333333-3333-3333-3333-333333333333")
 
 BASE_LINES = [
     "Payment is due within 30 days of invoice receipt.",
@@ -42,25 +50,51 @@ COMPARISON_PARAGRAPHS = [
 def _scalar_result(value: object) -> MagicMock:
     result = MagicMock()
     result.scalars.return_value.first.return_value = value
+    result.scalars.return_value.all.return_value = []
     return result
+
+
+MATTER_ORM = Matter(
+    id=MATTER_ID,
+    organization_id=ORG_ID,
+    name="Upload matter",
+    matter_number="matter-1",
+    status=MatterStatus.ACTIVE,
+    classification=MatterClassification.GENERAL,
+)
+USER_ORM = User(
+    id=USER_ID,
+    organization_id=ORG_ID,
+    email="owner@example.test",
+    display_name="test-user-1",
+    hashed_password="not-used",
+    is_active=True,
+    is_deleted=False,
+)
+MATTER_ORM.members = [MatterMember(matter_id=MATTER_ID, user_id=USER_ID, role=MatterMemberRole.EDITOR)]
 
 
 def _fake_session() -> AsyncMock:
     """Matter/user lookups succeed with an EDITOR membership; nothing else
-    touches the database in the upload flow (rows only go through add())."""
+    touches the database in the upload flow (rows only go through add()).
+    Audit-chain lookups answer with an empty chain (a fresh table)."""
     session = AsyncMock()
-    session.execute = AsyncMock(
-        side_effect=[
-            _scalar_result(
-                SimpleNamespace(
-                    id=MATTER_ID,
-                    members=[SimpleNamespace(user_id=USER_ID, role=MatterMemberRole.EDITOR)],
-                )
-            ),
-            _scalar_result(SimpleNamespace(id=USER_ID, display_name="test-user-1")),
-        ]
-    )
-    session.get = AsyncMock(return_value=None)
+
+    def fake_execute(statement: object, *args: object, **kwargs: object) -> MagicMock:
+        entity = statement.column_descriptions[0]["entity"]
+        if entity is Matter:
+            return _scalar_result(MATTER_ORM)
+        if entity is User:
+            return _scalar_result(USER_ORM)
+        return _scalar_result(None)
+
+    async def fake_get(model: type, pk: object, *args: object, **kwargs: object) -> object:
+        if model is User and pk == USER_ID:
+            return USER_ORM
+        return None
+
+    session.execute = AsyncMock(side_effect=fake_execute)
+    session.get = AsyncMock(side_effect=fake_get)
     session.add = MagicMock()
     session.flush = AsyncMock()
     return session
@@ -253,14 +287,24 @@ async def test_upload_oversized_file_returns_413() -> None:
 
 
 @pytest.mark.anyio
-async def test_upload_without_auth_returns_401() -> None:
-    async with AsyncClient(
-        transport=ASGITransport(app=create_app()), base_url="http://test"
-    ) as client:
+async def test_upload_without_token_succeeds_as_matter_default_user() -> None:
+    """Phase 1: no credential → run as the matter's EDITOR member, 201."""
+    session = _fake_session()
+
+    async with _client_with(session) as client:
         response = await client.post(
             "/api/v1/redlines/upload",
             files=_upload_files(),
             data={"matter_id": "matter-1"},
         )
 
-    assert response.status_code == 401, response.text
+    assert response.status_code == 201, response.text
+    jobs = _added_of(session, RedlineJob)
+    assert len(jobs) == 1
+
+    audits = _added_of(session, AuditEvent)
+    assert len(audits) == 1
+    assert str(audits[0].actor_id) == str(USER_ID)
+    assert audits[0].actor_email == "owner@example.test"
+    assert audits[0].metadata_json["auth"] == "anonymous (default user)"
+    assert audits[0].prev_hash and audits[0].row_hash and audits[0].seq

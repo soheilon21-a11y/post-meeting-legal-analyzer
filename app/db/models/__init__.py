@@ -37,6 +37,7 @@ from app.db.models.redline import RedlineChange
 from app.db.models.redline import RedlineJob
 from app.db.models.redline import RedlineStatus
 from app.db.models.redline import ReviewStatus
+from app.db.models.session import Session
 from app.db.models.user import User
 
 __all__ = [
@@ -75,6 +76,7 @@ __all__ = [
     "RedlineJob",
     "RedlineStatus",
     "ReviewStatus",
+    "Session",
     "SourceType",
     "TranscriptSegment",
     "User",

@@ -12,6 +12,10 @@ from jose import jwt
 from app.core.config.settings import JwtSettings
 from app.core.config.settings import get_settings
 
+# Name of the long-lived, HttpOnly session cookie set on register/login and
+# validated server-side against the ``sessions`` table (revocable).
+SESSION_COOKIE_NAME = "local_session"
+
 
 class TokenPayload:
     def __init__(
@@ -69,6 +73,25 @@ class TokenService:
 
     def create_refresh_token(self, user_id: str, org_id: str | None = None) -> str:
         payload = TokenPayload(sub=user_id, org_id=org_id, token_type="refresh")
+        return self._encode(payload)
+
+    def create_session_token(
+        self, user_id: str, org_id: str | None, session_id: str
+    ) -> str:
+        """Mint the long-lived cookie token for a server-side session.
+
+        ``type == "session"`` and the ``jti`` claim carries the sessions-table
+        primary key, so every request re-validates the token against the
+        session row (revocation + expiry) instead of trusting the JWT alone.
+        """
+        payload = TokenPayload(
+            sub=user_id,
+            org_id=org_id,
+            token_type="session",
+            jti=session_id,
+            exp=datetime.now(UTC)
+            + timedelta(days=self._settings.session_cookie_ttl_days),
+        )
         return self._encode(payload)
 
     def decode_token(self, token: str) -> TokenPayload:

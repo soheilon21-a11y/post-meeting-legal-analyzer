@@ -139,6 +139,10 @@ class JwtSettings(BaseSettings):
     algorithm: str = Field(default="HS256")
     access_token_expire_minutes: int = Field(default=30, ge=1)
     refresh_token_expire_days: int = Field(default=7, ge=1)
+    # TTL of the server-side session backing the local_session cookie.
+    # 90 days (NOT 365): long enough to avoid re-logins on a personal
+    # machine, short enough that a stale laptop cookie eventually dies.
+    session_cookie_ttl_days: int = Field(default=90, ge=1)
 
 
 class AppSettings(BaseSettings):
@@ -151,6 +155,12 @@ class AppSettings(BaseSettings):
     host: str = Field(default="0.0.0.0")
     port: int = Field(default=8000)
     workers: int = Field(default=2, ge=1)
+    # DNS-rebinding guard: comma-separated Host names accepted by the
+    # host-allowlist middleware (any port).  This is a localhost-only
+    # deployment tool, so loopback names are the production allowlist;
+    # 'test'/'testserver' are the hosts httpx ASGITransport and FastAPI's
+    # TestClient send, used exclusively by the local test suite.
+    allowed_hosts: str = Field(default="localhost,127.0.0.1,test,testserver")
 
 
 class SecuritySettings(BaseSettings):

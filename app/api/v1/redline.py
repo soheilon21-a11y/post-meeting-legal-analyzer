@@ -10,6 +10,7 @@ from typing import Any
 from uuid import UUID
 from uuid import uuid4
 
+import structlog.contextvars
 from fastapi import APIRouter
 from fastapi import Body
 from fastapi import Depends
@@ -24,9 +25,12 @@ from fastapi import status
 from pydantic import BaseModel
 from pydantic import Field
 
-from app.api.dependencies.auth import get_token_payload
+from app.api.dependencies.auth import get_optional_token_payload
 from app.api.dependencies.db import get_db
 from app.core.exceptions.domain import FileTooLargeError
+from app.core.security.tokens import TokenPayload
+from app.db.models.audit import AuditEvent
+from app.db.models.audit import AuditEventType
 from app.db.models.document import Document
 from app.db.models.document import DocumentClassification
 from app.db.models.document import DocumentSegment
@@ -43,6 +47,7 @@ from app.db.models.user import User
 from app.domain.redlining.enums import RedlineStatus as DomainRedlineStatus
 from app.infrastructure.documents.extraction import MAX_UPLOAD_BYTES
 from app.infrastructure.documents.extraction import extract_text
+from app.infrastructure.persistence.audit_chain import append_audit_event
 from app.infrastructure.reporting.redline_report_pdf import render_redline_report_pdf
 
 if TYPE_CHECKING:
@@ -147,6 +152,95 @@ def _require_matter_access(
             status.HTTP_403_FORBIDDEN,
             detail="Insufficient matter permissions",
         )
+
+
+# ─── Tokenless identity resolution ─────────────────────────────────────────
+#
+# All redline endpoints authenticate in this order:
+#   1. Valid Bearer token  → act as that token's user (unchanged behavior).
+#   2. No token at all     → act as the matter's DEFAULT user, i.e. the
+#      member holding OWNER/EDITOR membership (the matter owner/creator).
+#      Audit metadata records "auth": "anonymous (default user)".
+#   3. A missing token is never 401/403; a present-but-invalid/expired one
+#      still is (raised inside get_optional_token_payload).
+
+_AUTH_TOKEN = "token"
+_AUTH_ANONYMOUS = "anonymous (default user)"
+
+
+async def _default_matter_user(session: AsyncSession, matter: Matter) -> User | None:
+    """Matter owner, else editor, else any viewer member — tokenless default."""
+    for role in (
+        MatterMemberRole.OWNER,
+        MatterMemberRole.EDITOR,
+        MatterMemberRole.VIEWER,
+    ):
+        member = next((m for m in matter.members if m.role == role), None)
+        if member is not None:
+            user = await session.get(User, member.user_id)
+            if user is not None:
+                return user
+    return None
+
+
+async def _resolve_actor(
+    session: AsyncSession,
+    matter: Matter,
+    payload: TokenPayload | None,
+    *,
+    allowed_roles: set[MatterMemberRole] | None,
+) -> tuple[User, str]:
+    """Return (acting user, auth mode) for one redline request."""
+    if payload is not None:
+        user = await _resolve_user(session, payload.sub)
+        if allowed_roles is not None:
+            _require_matter_access(matter, user, allowed_roles)
+        return user, _AUTH_TOKEN
+    user = await _default_matter_user(session, matter)
+    if user is None:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "Matter has no default user (owner/editor member) to attribute "
+            "this tokenless request to",
+        )
+    return user, _AUTH_ANONYMOUS
+
+
+async def _audit_redline(
+    session: AsyncSession,
+    *,
+    matter: Matter,
+    user: User,
+    auth_mode: str,
+    event_type: AuditEventType,
+    resource_id: UUID,
+) -> None:
+    """Hash-chained audit row for a redline mutation, with attribution.
+
+    The actor identity (id + email) is snapshotted at write time so it
+    survives a later (soft) deletion of the user.
+    """
+    metadata: dict[str, Any] = {
+        "auth": auth_mode,
+        "matter_id": str(matter.id),
+        "redline_job_id": str(resource_id),
+    }
+    request_id = structlog.contextvars.get_contextvars().get("request_id")
+    if request_id:
+        metadata["request_id"] = request_id
+    await append_audit_event(
+        session,
+        AuditEvent(
+            organization_id=matter.organization_id,
+            matter_id=matter.id,
+            actor_id=user.id,
+            actor_email=user.email,
+            event_type=event_type,
+            resource_type="redline_job",
+            resource_id=resource_id,
+            metadata_json=metadata,
+        ),
+    )
 
 
 async def _resolve_document_version(
@@ -379,18 +473,22 @@ def _new_redline_job(
 )
 async def create_redline(
     request: CreateRedlineRequest = Body(...),
-    payload: Any = Depends(get_token_payload),
+    payload: TokenPayload | None = Depends(get_optional_token_payload),
     session: AsyncSession = Depends(get_db),
 ) -> RedlineResponseAPI:
     """Create a new RedlineJob for the given matter and document pair.
 
-    Requires authentication with matter EDIT access.  The matter is looked
-    up by UUID or matter_number; the token subject is resolved to a user by
-    UUID or display_name (see scripts/seed_dev_data.py).
+    The matter is looked up by UUID or matter_number.  A valid Bearer token
+    attributes the job (and its audit row) to that token's user, which must
+    hold matter EDIT access; with no token the request runs as the matter's
+    default user (owner/editor member) and the audit metadata is marked
+    "anonymous (default user)".  A missing token is never rejected — only a
+    present-but-invalid/expired one is.
     """
     matter = await _resolve_matter(session, request.matter_id)
-    user = await _resolve_user(session, payload.sub)
-    _require_matter_access(matter, user, _EDIT_ROLES)
+    user, auth_mode = await _resolve_actor(
+        session, matter, payload, allowed_roles=_EDIT_ROLES
+    )
     base_version = await _resolve_document_version(
         session, request.base_document_id, "base_document_id"
     )
@@ -406,6 +504,15 @@ async def create_redline(
         configuration={"deterministic_seed": request.deterministic_seed},
     )
     await session.flush()
+
+    await _audit_redline(
+        session,
+        matter=matter,
+        user=user,
+        auth_mode=auth_mode,
+        event_type=AuditEventType.REDLINE_CREATE,
+        resource_id=job.id,
+    )
 
     return RedlineResponseAPI(
         id=str(job.id),
@@ -428,7 +535,7 @@ async def create_redline_from_upload(
     matter_id: Annotated[str, Form(min_length=1, max_length=200)],
     title: Annotated[str | None, Form(max_length=200)] = None,
     deterministic_seed: Annotated[int, Form(ge=0)] = 42,
-    payload: Any = Depends(get_token_payload),
+    payload: TokenPayload | None = Depends(get_optional_token_payload),
     session: AsyncSession = Depends(get_db),
 ) -> RedlineResponseAPI:
     """Upload a base and a comparison document and create a RedlineJob.
@@ -442,15 +549,16 @@ async def create_redline_from_upload(
     empty-extraction returns 422) and are persisted under the matter as
     ``Document`` + ``DocumentVersion`` rows with extracted-text
     ``DocumentSegment`` rows (mirroring scripts/seed_dev_data.py).  Source
-    ids are derived from the file names.  Requires authentication with matter
-    EDIT access — identical auth, membership check and response shape to
+    ids are derived from the file names.  Auth, membership check, tokenless
+    default-user attribution and response shape are identical to
     ``POST /redlines/``.  Generation then runs through
     ``POST /redlines/{id}/generate``, where the persisted segments feed the
     bounded token-optimization pipeline.
     """
     matter = await _resolve_matter(session, matter_id)
-    user = await _resolve_user(session, payload.sub)
-    _require_matter_access(matter, user, _EDIT_ROLES)
+    user, auth_mode = await _resolve_actor(
+        session, matter, payload, allowed_roles=_EDIT_ROLES
+    )
 
     base_name, base_source_id, base_text, base_data = await _extract_upload(base_file)
     comparison_name, comparison_source_id, comparison_text, comparison_data = (
@@ -493,6 +601,15 @@ async def create_redline_from_upload(
     )
     await session.flush()
 
+    await _audit_redline(
+        session,
+        matter=matter,
+        user=user,
+        auth_mode=auth_mode,
+        event_type=AuditEventType.REDLINE_CREATE,
+        resource_id=job.id,
+    )
+
     return RedlineResponseAPI(
         id=str(job.id),
         status=str(job.status),
@@ -508,12 +625,15 @@ async def create_redline_from_upload(
 async def get_redline(
     redline_id: UUID = Path(...,
                             description="The redline job UUID"),
-    payload: Any = Depends(get_token_payload),
+    payload: TokenPayload | None = Depends(get_optional_token_payload),
     session: AsyncSession = Depends(get_db),
 ) -> RedlineResponseAPI:
     """Retrieve a RedlineJob and its associated RedlineChange information.
 
-    Requires authentication with matter READ access.
+    Works with or without a token: a valid Bearer token is honored as before,
+    and a missing token is accepted (reads never write audit rows, so there
+    is nothing to attribute).  Unknown ids still 404; an invalid token still
+    401.
     """
     job = await session.get(RedlineJob, redline_id)
     if job is None:
@@ -532,7 +652,7 @@ async def get_redline(
 async def get_redline_report(
     redline_id: UUID = Path(...,
                             description="The redline job UUID"),
-    payload: Any = Depends(get_token_payload),
+    payload: TokenPayload | None = Depends(get_optional_token_payload),
     session: AsyncSession = Depends(get_db),
 ) -> Response:
     """Render a redline job as a professional, downloadable PDF.
@@ -542,8 +662,9 @@ async def get_redline_report(
     report: header with job id/status/date, base and comparison document
     identifiers, a table of proposed changes (clause path, original and
     proposed text, rationale, risk level, confidence, review status) and
-    verbatim citation footnotes.  Requires authentication, exactly like the
-    other redline endpoints.  Unknown redline ids yield a 404.
+    verbatim citation footnotes.  Tokenless like every other redline
+    endpoint (a present-but-invalid token still yields 401).  Unknown
+    redline ids yield a 404.
     """
     job = await session.get(RedlineJob, redline_id)
     if job is None:
@@ -568,7 +689,7 @@ async def generate_redline(
     redline_id: UUID = Path(...,
                             description="The redline job UUID"),
     request: GenerateRedlineRequest = Body(...),
-    payload: Any = Depends(get_token_payload),
+    payload: TokenPayload | None = Depends(get_optional_token_payload),
     session: AsyncSession = Depends(get_db),
 ) -> RedlineResponseAPI:
     """Trigger the existing redline generation workflow.
@@ -578,7 +699,9 @@ async def generate_redline(
     and bounded RAG context from the matter's corpus.  Document text and RAG
     evidence are fitted to the model's context window through the shared
     token/context optimization pipeline before generation.  Generated domain
-    changes are persisted as RedlineChange rows.
+    changes are persisted as RedlineChange rows.  The write is audit-chained
+    under the Bearer token's user, or under the matter's default
+    (owner/editor) user when no token is sent.
     """
     job = await session.get(RedlineJob, redline_id)
     if job is None:
@@ -586,6 +709,13 @@ async def generate_redline(
             status.HTTP_404_NOT_FOUND,
             f"Redline job {redline_id} not found",
         )
+
+    matter = await session.get(Matter, job.matter_id)
+    if matter is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Matter not found")
+    actor, auth_mode = await _resolve_actor(
+        session, matter, payload, allowed_roles=None
+    )
 
     # The two documents under review are always supplied as paragraph-level
     # context items (known by id); vector search only supplements with
@@ -686,6 +816,15 @@ async def generate_redline(
     job.status = _DOMAIN_TO_ORM_STATUS[domain_job.status]
     await session.flush()
 
+    await _audit_redline(
+        session,
+        matter=matter,
+        user=actor,
+        auth_mode=auth_mode,
+        event_type=AuditEventType.REDLINE_GENERATE,
+        resource_id=job.id,
+    )
+
     return RedlineResponseAPI(
         id=str(job.id),
         status=str(job.status),
@@ -702,12 +841,14 @@ async def review_redline(
     redline_id: UUID = Path(...,
                             description="The redline job UUID"),
     request: ReviewRedlineChangeRequest = Body(...),
-    payload: Any = Depends(get_token_payload),
+    payload: TokenPayload | None = Depends(get_optional_token_payload),
     session: AsyncSession = Depends(get_db),
 ) -> RedlineResponseAPI:
     """Submit a review decision (approve/reject) for a single RedlineChange.
 
-    Requires authentication with matter EDIT access.
+    A Bearer token's user must hold matter EDIT access; with no token the
+    decision is made and attributed as the matter's default (owner/editor)
+    user.
     """
     job = await session.get(RedlineJob, redline_id)
     if job is None:
@@ -719,8 +860,9 @@ async def review_redline(
     matter = await session.get(Matter, job.matter_id)
     if matter is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Matter not found")
-    user = await _resolve_user(session, payload.sub)
-    _require_matter_access(matter, user, _EDIT_ROLES)
+    user, auth_mode = await _resolve_actor(
+        session, matter, payload, allowed_roles=_EDIT_ROLES
+    )
 
     try:
         change_id_uuid = UUID(request.change_id)
@@ -760,6 +902,18 @@ async def review_redline(
     session.add(job)
     await session.flush()
 
+    await _audit_redline(
+        session,
+        matter=matter,
+        user=user,
+        auth_mode=auth_mode,
+        event_type=(
+            AuditEventType.REDLINE_APPROVE if request.approve
+            else AuditEventType.REDLINE_REJECT
+        ),
+        resource_id=job.id,
+    )
+
     return _job_response(job)
 
 
@@ -771,18 +925,18 @@ async def review_redline(
 async def list_redlines(
     matter_id: str = Query(..., min_length=1, max_length=200,
                            description="Matter UUID or matter_number"),
-    payload: Any = Depends(get_token_payload),
+    payload: TokenPayload | None = Depends(get_optional_token_payload),
     session: AsyncSession = Depends(get_db),
 ) -> tuple[RedlineResponseAPI, ...]:
     """List RedlineJobs associated with a given matter.
 
-    Requires authentication with matter READ access (any member role).
+    A Bearer token's user must hold matter READ access (any member role);
+    with no token the list is served to the matter's default user.
     """
     from sqlalchemy import select
 
     matter = await _resolve_matter(session, matter_id)
-    user = await _resolve_user(session, payload.sub)
-    _require_matter_access(matter, user, _READ_ROLES)
+    await _resolve_actor(session, matter, payload, allowed_roles=_READ_ROLES)
 
     result = await session.execute(
         select(RedlineJob).where(RedlineJob.matter_id == matter.id)
