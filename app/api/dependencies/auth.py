@@ -4,6 +4,7 @@ from datetime import UTC
 from datetime import datetime
 from typing import TYPE_CHECKING
 from typing import Annotated
+from urllib.parse import urlsplit
 from uuid import UUID
 
 from fastapi import Cookie
@@ -103,15 +104,35 @@ async def _authenticate(
         # re-checks the server-side session row (DB; Redis would work the
         # same way — no new dependency).
         await _verify_session_row(session, payload)
-    if via_cookie and request.method in _MUTATING_METHODS:
-        # Cross-site form posts cannot set custom headers; a same-site SPA
-        # always sends this marker.  Bearer callers are exempt.
-        if request.headers.get("x-requested-with") != "XMLHttpRequest":
-            raise ForbiddenError(
-                "Cookie-authenticated mutations require the "
-                "X-Requested-With: XMLHttpRequest header"
-            )
+    if via_cookie and request.method in _MUTATING_METHODS and not _same_origin_proof(request):
+        raise ForbiddenError(
+            "Cookie-authenticated mutations require the X-Requested-With: "
+            "XMLHttpRequest header or a same-origin Origin/Referer "
+            "(Swagger UI at /docs and any local front end qualify)"
+        )
     return payload
+
+
+def _same_origin_proof(request: Request) -> bool:
+    """Evidence that a cookie-authenticated mutation came from this app's
+    own origin.
+
+    The session cookie is ``HttpOnly; SameSite=Strict``, so a cross-site
+    page cannot attach it at all — this check is defence-in-depth for the
+    (future) case where SameSite is relaxed.  Accepted proofs: the legacy
+    ``X-Requested-With`` marker that same-site XHR/fetch wrappers set, or a
+    browser-supplied ``Origin``/``Referer`` whose host:port matches the
+    request (Swagger UI's fetches from /docs send it automatically).
+    Non-browser callers send neither header and must fall back to a Bearer
+    token or the explicit marker.
+    """
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return True
+    origin = request.headers.get("origin") or request.headers.get("referer")
+    if not origin:
+        return False
+    netloc = urlsplit(origin).netloc
+    return bool(netloc) and netloc == request.url.netloc
 
 
 async def _verify_session_row(session: AsyncSession, payload: TokenPayload) -> None:

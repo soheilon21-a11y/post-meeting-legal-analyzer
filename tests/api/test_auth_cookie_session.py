@@ -239,6 +239,77 @@ async def test_cookie_only_auth_successfully_creates_redline(
     assert audits[0].metadata_json["auth"] == "token"  # cookie is a token path
 
 
+@pytest.mark.anyio
+async def test_cookie_mutation_from_same_origin_is_accepted_without_xhr_marker(
+    app: Any, session: FakeSession
+) -> None:
+    """Swagger UI (served from /docs) cannot add custom headers to its
+    fetches; the browser-supplied same-origin Origin must satisfy CSRF."""
+    base, comparison = _add_document_versions(session)
+    async with _client(app) as client:
+        registered = await _register(client)
+        created = await client.post(
+            "/api/v1/redlines/",
+            json={
+                "matter_id": registered["matter_number"],
+                "base_document_id": str(base.id),
+                "comparison_document_id": str(comparison.id),
+                "deterministic_seed": 42,
+            },
+            headers={"Origin": "http://test"},  # == client base_url host
+        )
+
+    assert created.status_code == 201, created.text
+    audits = [row for row in session.of_type(AuditEvent) if row.event_type == "redline_create"]
+    assert len(audits) == 1  # attributed to the cookie user, not anonymous
+
+
+@pytest.mark.anyio
+async def test_cookie_mutation_from_cross_site_origin_without_xhr_marker_is_forbidden(
+    app: Any, session: FakeSession
+) -> None:
+    base, comparison = _add_document_versions(session)
+    async with _client(app) as client:
+        registered = await _register(client)
+        response = await client.post(
+            "/api/v1/redlines/",
+            json={
+                "matter_id": registered["matter_number"],
+                "base_document_id": str(base.id),
+                "comparison_document_id": str(comparison.id),
+                "deterministic_seed": 42,
+            },
+            headers={"Origin": "https://evil.example"},
+        )
+
+    assert response.status_code == 403, response.text
+    assert "Cookie-authenticated mutations" in response.json()["detail"]
+    assert not [r for r in session.of_type(AuditEvent) if r.event_type == "redline_create"]
+
+
+@pytest.mark.anyio
+async def test_cookie_mutation_without_origin_or_xhr_proof_is_forbidden(
+    app: Any, session: FakeSession
+) -> None:
+    """Non-browser clients send no Origin: keep the explicit-marker (or
+    Bearer) requirement for them."""
+    base, comparison = _add_document_versions(session)
+    async with _client(app) as client:
+        registered = await _register(client)
+        response = await client.post(
+            "/api/v1/redlines/",
+            json={
+                "matter_id": registered["matter_number"],
+                "base_document_id": str(base.id),
+                "comparison_document_id": str(comparison.id),
+                "deterministic_seed": 42,
+            },
+        )
+
+    assert response.status_code == 403, response.text
+    assert "X-Requested-With" in response.json()["detail"]
+
+
 # ─── 3. Revocation: logout clears cookie + kills session; expired too ──────
 
 
