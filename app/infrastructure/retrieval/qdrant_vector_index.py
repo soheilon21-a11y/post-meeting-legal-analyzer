@@ -126,6 +126,7 @@ class QdrantVectorIndex(VectorIndexPort):
                     "page_number": item.page_number,
                     "start_offset": item.start_offset,
                     "end_offset": item.end_offset,
+                    "position": item.position,
                 },
             )
             for item in items
@@ -182,9 +183,63 @@ class QdrantVectorIndex(VectorIndexPort):
                     page_number=payload.get("page_number"),
                     start_offset=payload.get("start_offset"),
                     end_offset=payload.get("end_offset"),
+                    position=payload.get("position"),
                 )
             )
         return tuple(hits)
+
+    async def scroll_by_matter(self, matter_id: str) -> tuple[VectorHit, ...]:
+        """Return every indexed chunk for one matter (metadata-only read).
+
+        No embedding or similarity search is performed; this is a plain
+        payload scroll used to reconstruct stored document text.
+        """
+        return await asyncio.to_thread(self._scroll_sync, matter_id)
+
+    def _scroll_sync(self, matter_id: str) -> tuple[VectorHit, ...]:
+        from qdrant_client.models import FieldCondition
+        from qdrant_client.models import Filter
+        from qdrant_client.models import MatchValue
+
+        try:
+            if not self._client.collection_exists(self._collection_name):
+                return ()
+            query_filter = Filter(
+                must=[FieldCondition(key="matter_id", match=MatchValue(value=matter_id))]
+            )
+            hits: list[VectorHit] = []
+            offset: Any = None
+            while True:
+                points, offset = self._client.scroll(
+                    collection_name=self._collection_name,
+                    scroll_filter=query_filter,
+                    limit=256,
+                    offset=offset,
+                    with_payload=True,
+                    with_vectors=False,
+                )
+                for point in points:
+                    payload = point.payload or {}
+                    hits.append(
+                        VectorHit(
+                            chunk_id=str(payload.get("chunk_id", point.id)),
+                            source_id=str(payload.get("source_id", "")),
+                            text=str(payload.get("text", "")),
+                            score=0.0,
+                            page_number=payload.get("page_number"),
+                            start_offset=payload.get("start_offset"),
+                            end_offset=payload.get("end_offset"),
+                            position=payload.get("position"),
+                        )
+                    )
+                if offset is None:
+                    break
+            return tuple(hits)
+        except Exception as exc:
+            raise ProcessingError(
+                "vector_index_scroll",
+                f"Qdrant scroll failed: {exc}",
+            ) from exc
 
     def _ensure_collection_sync(self) -> None:
         from qdrant_client.models import Distance

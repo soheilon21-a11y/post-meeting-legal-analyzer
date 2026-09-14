@@ -56,6 +56,7 @@ class CorpusIndexingService:
                 text=chunk.text,
                 vector=vector,
                 page_number=chunk.metadata.page_number,
+                position=position,
             )
             for position, (chunk, vector) in enumerate(zip(chunks, vectors, strict=True))
         )

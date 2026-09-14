@@ -13,6 +13,7 @@ class IndexedChunk:
     page_number: int | None = None
     start_offset: int | None = None
     end_offset: int | None = None
+    position: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -24,3 +25,4 @@ class VectorHit:
     page_number: int | None = None
     start_offset: int | None = None
     end_offset: int | None = None
+    position: int | None = None

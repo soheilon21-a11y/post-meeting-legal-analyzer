@@ -204,6 +204,44 @@ async def test_upload_pdf_without_extractable_text_returns_422(
 
 
 @pytest.mark.anyio
+async def test_upload_trims_surrounding_whitespace_from_source_id(
+    fake_pipeline: tuple[FakeEmbeddings, FakeIndex],
+) -> None:
+    _, index = fake_pipeline
+
+    async with _client() as client:
+        response = await client.post(
+            "/api/v1/corpus/documents/upload",
+            files={"file": ("transcript.txt", TRANSCRIPT.encode("utf-8"), "text/plain")},
+            data={"matter_id": "matter-7", "source_id": " transcript-julia "},
+        )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["source_id"] == "transcript-julia"
+    assert index.upserted
+    assert all(item.source_id == "transcript-julia" for item in index.upserted)
+
+
+@pytest.mark.anyio
+async def test_index_json_trims_surrounding_whitespace_from_source_id(
+    fake_pipeline: tuple[FakeEmbeddings, FakeIndex],
+) -> None:
+    _, index = fake_pipeline
+
+    async with _client() as client:
+        response = await client.post(
+            "/api/v1/corpus/documents",
+            json={"matter_id": "matter-8", "source_id": " contract-1 ", "text": TRANSCRIPT},
+        )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["source_id"] == "contract-1"
+    assert all(item.source_id == "contract-1" for item in index.upserted)
+
+
+@pytest.mark.anyio
 async def test_upload_oversized_file_returns_413(
     fake_pipeline: tuple[FakeEmbeddings, FakeIndex],
 ) -> None:

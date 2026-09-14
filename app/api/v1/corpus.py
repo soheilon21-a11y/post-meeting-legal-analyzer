@@ -34,6 +34,8 @@ from app.infrastructure.retrieval import QdrantVectorIndex
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
+    from app.application.dtos.internal.vector_index import VectorHit
+
 router = APIRouter(prefix="/corpus", tags=["Corpus"])
 
 
@@ -52,7 +54,11 @@ class IndexDocumentResponse(BaseModel):
 
 async def _index_extracted_text(matter_id: str, source_id: str, text: str) -> IndexDocumentResponse:
     """Run the shared indexing pipeline: structure-aware chunking →
-    nomic-embed-text embeddings → Qdrant upsert."""
+    nomic-embed-text embeddings → Qdrant upsert.
+
+    The stored chunk payloads carry the (already trimmed) ``source_id``, so
+    the indexed text stays retrievable through
+    ``GET /corpus/documents/{source_id}/text``."""
     settings = get_settings()
 
     chunker = Chunker(
@@ -82,10 +88,16 @@ async def index_document(request: IndexDocumentRequest) -> IndexDocumentResponse
     The text is split with the structure-aware chunker, embedded with the
     local Ollama embedding model, and upserted into the vector index under
     the supplied matter scope.  Reindexing the same ``source_id`` with the
-    same content is idempotent.
+    same content is idempotent.  Surrounding whitespace on ``source_id`` is
+    stripped before use, so the document stays findable afterwards via
+    ``GET /corpus/documents/{source_id}/text``.
     """
-    source_id = request.source_id or str(uuid4())
-    return await _index_extracted_text(request.matter_id, source_id, request.text)
+    source_id = (request.source_id or "").strip() or str(uuid4())
+    return await _index_extracted_text(
+        request.matter_id.strip(),
+        source_id,
+        request.text,
+    )
 
 
 @router.post("/documents/upload", response_model=IndexDocumentResponse)
@@ -98,7 +110,9 @@ async def upload_document(
 
     Accepts ``multipart/form-data`` with a ``file`` part plus a ``matter_id``
     form field and an optional ``source_id`` (defaults to the file name
-    without its extension).
+    without its extension).  Surrounding whitespace on both form fields is
+    stripped before use, so stray spaces in HTML form values cannot create
+    unfindable documents.
 
     Supported formats: PDF (.pdf), DOCX (.docx), TXT (.txt), Markdown (.md);
     anything else is rejected with 422.  Files up to 20 MB are accepted
@@ -119,15 +133,15 @@ async def upload_document(
     filename = Path((file.filename or "").replace("\\", "/")).name
     text = extract_text(filename, data)
 
-    resolved_source_id = source_id or Path(filename).stem or str(uuid4())
-    return await _index_extracted_text(matter_id, resolved_source_id, text)
+    resolved_source_id = (source_id or "").strip() or Path(filename).stem or str(uuid4())
+    return await _index_extracted_text(matter_id.strip(), resolved_source_id, text)
 
 
 class CorpusDocumentTextResponse(BaseModel):
     matter_id: str
     source_id: str
-    document_id: str
-    document_version_id: str
+    document_id: str | None
+    document_version_id: str | None
     title: str
     segment_count: int
     text: str
@@ -149,6 +163,52 @@ async def _resolve_matter_by_handle(session: AsyncSession, raw: str) -> Matter:
     return matter
 
 
+_UNPOSITIONED = 2**31
+
+
+def _matter_handles(matter: Matter, raw_matter_id: str) -> list[str]:
+    """All strings the matter may have been indexed in the corpus under."""
+    candidates = [
+        raw_matter_id.strip(),
+        str(matter.id),
+        getattr(matter, "matter_number", None) or "",
+    ]
+    handles: list[str] = []
+    for candidate in candidates:
+        if candidate and candidate not in handles:
+            handles.append(candidate)
+    return handles
+
+
+async def _corpus_index_texts(
+    matter: Matter,
+    raw_matter_id: str,
+    source_id: str,
+) -> tuple[str, ...]:
+    """Return the indexed chunk texts of a corpus document by source_id.
+
+    Matches the (whitespace-stripped) ``source_id`` recorded in the vector
+    index payloads of documents indexed through ``POST /corpus/documents``
+    and ``POST /corpus/documents/upload``, in original chunk order.  This is
+    a metadata scroll — it never calls the embedding model.
+    """
+    index = QdrantVectorIndex.from_settings()
+    matching: list[VectorHit] = []
+    for handle in _matter_handles(matter, raw_matter_id):
+        hits = await index.scroll_by_matter(handle)
+        matching = [hit for hit in hits if hit.source_id.strip() == source_id and hit.text.strip()]
+        if matching:
+            break
+    matching.sort(
+        key=lambda hit: (
+            hit.page_number or 0,
+            hit.position if hit.position is not None else _UNPOSITIONED,
+            hit.chunk_id,
+        )
+    )
+    return tuple(hit.text for hit in matching)
+
+
 @router.get(
     "/documents/{source_id}/text",
     response_model=CorpusDocumentTextResponse,
@@ -162,15 +222,24 @@ async def get_document_text(
     ],
     session: AsyncSession = Depends(get_db),
 ) -> CorpusDocumentTextResponse:
-    """Return the stored extracted text of a document, joined from its
-    ``DocumentSegment`` rows in reading order (page, then paragraph).
+    """Return the stored text of any document indexed into this matter's
+    corpus, addressed by its ``source_id``.
 
-    ``source_id`` matches the file name stem recorded when a redline upload
-    persisted the document (``Document.source_filename``), or its title.  The
-    latest document version is used.  Unknown matters/documents (or versions
-    without any extracted text) return 404.  This is a local read of rows
-    already in PostgreSQL — it never calls Ollama or the vector index.
+    Surrounding whitespace is stripped from ``source_id`` before lookup.  Two
+    sources are resolved, in order:
+
+    1. Documents persisted as PostgreSQL rows (redline uploads): matched on
+       the file name stem recorded in ``Document.source_filename`` or on
+       ``Document.title`` (latest version, segments joined in reading order).
+    2. Corpus-indexed documents (``POST /corpus/documents`` JSON-direct or
+       ``POST /corpus/documents/upload``), whose text lives in the vector
+       index: matched on the stored chunk payload ``source_id`` (also
+       whitespace-stripped on both sides).
+
+    Unknown matters/documents return 404.  The resolution never calls the
+    embedding model — the vector-index path is a payload metadata scroll.
     """
+    resolved_source_id = source_id.strip()
     matter = await _resolve_matter_by_handle(session, matter_id)
 
     document = next(
@@ -178,30 +247,44 @@ async def get_document_text(
             doc
             for doc in (matter.documents or ())
             if getattr(doc, "deleted_at", None) is None
-            and (Path(doc.source_filename).stem == source_id or doc.title == source_id)
+            and (
+                Path(doc.source_filename).stem.strip() == resolved_source_id
+                or doc.title.strip() == resolved_source_id
+            )
         ),
         None,
     )
     versions = list(getattr(document, "versions", None) or ()) if document else []
-    if document is None or not versions:
-        raise NotFoundError(entity="Document", identifier=source_id)
-    version = versions[-1]
+    if document is not None and versions:
+        version = versions[-1]
 
-    result = await session.execute(
-        select(DocumentSegment.text)
-        .where(DocumentSegment.document_version_id == version.id)
-        .order_by(DocumentSegment.page_number, DocumentSegment.paragraph_number)
-    )
-    texts = [text for text in result.scalars().all() if text and text.strip()]
-    if not texts:
-        raise NotFoundError(entity="Document", identifier=source_id)
+        result = await session.execute(
+            select(DocumentSegment.text)
+            .where(DocumentSegment.document_version_id == version.id)
+            .order_by(DocumentSegment.page_number, DocumentSegment.paragraph_number)
+        )
+        texts = [text for text in result.scalars().all() if text and text.strip()]
+        if texts:
+            return CorpusDocumentTextResponse(
+                matter_id=str(matter.id),
+                source_id=resolved_source_id,
+                document_id=str(document.id),
+                document_version_id=str(version.id),
+                title=document.title,
+                segment_count=len(texts),
+                text="\n\n".join(texts),
+            )
+
+    corpus_texts = await _corpus_index_texts(matter, matter_id, resolved_source_id)
+    if not corpus_texts:
+        raise NotFoundError(entity="Document", identifier=resolved_source_id)
 
     return CorpusDocumentTextResponse(
         matter_id=str(matter.id),
-        source_id=source_id,
-        document_id=str(document.id),
-        document_version_id=str(version.id),
-        title=document.title,
-        segment_count=len(texts),
-        text="\n\n".join(texts),
+        source_id=resolved_source_id,
+        document_id=None,
+        document_version_id=None,
+        title=resolved_source_id,
+        segment_count=len(corpus_texts),
+        text="\n\n".join(corpus_texts),
     )

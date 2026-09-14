@@ -12,6 +12,7 @@ from httpx import AsyncClient
 
 from app.api.dependencies.db import get_db
 from app.api.v1 import corpus as corpus_api
+from app.application.dtos.internal.vector_index import VectorHit
 from app.main import create_app
 
 MATTER_ID = UUID("77777777-7777-7777-7777-777777777777")
@@ -22,6 +23,18 @@ SEGMENT_TEXTS = [
     "Payment is due within 30 days of invoice receipt.",
     "Supplier liability is capped at direct damages.",
 ]
+
+
+def _patch_index(
+    monkeypatch: pytest.MonkeyPatch, hits: list[VectorHit]
+) -> None:
+    index = MagicMock()
+    index.scroll_by_matter = AsyncMock(return_value=tuple(hits))
+    monkeypatch.setattr(
+        corpus_api,
+        "QdrantVectorIndex",
+        SimpleNamespace(from_settings=lambda: index),
+    )
 
 
 def _text_result(texts: list[str]) -> MagicMock:
@@ -99,7 +112,10 @@ async def test_document_text_matches_by_title_and_works_with_matter_uuid() -> No
 
 
 @pytest.mark.anyio
-async def test_document_text_unknown_source_returns_404() -> None:
+async def test_document_text_unknown_source_returns_404(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_index(monkeypatch, [])
     session = AsyncMock()
     session.execute = AsyncMock(side_effect=[_matter_result(_matter())])
 
@@ -150,3 +166,79 @@ async def test_document_text_is_pure_local_read_never_touches_ai_pipeline(
         )
 
     assert response.status_code == 200, response.text
+
+
+def _matter_without_documents() -> SimpleNamespace:
+    return SimpleNamespace(id=MATTER_ID, documents=[], matter_number="matter-1")
+
+
+@pytest.mark.anyio
+async def test_document_text_resolves_json_indexed_corpus_document(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A corpus document (no PostgreSQL Document row) downloads by stored
+    source_id, even when the stored value carries stray whitespace."""
+    hits = [
+        VectorHit(
+            chunk_id="chunk-2",
+            source_id=" transcript-julia",
+            text="Second paragraph.",
+            score=0.0,
+            position=1,
+        ),
+        VectorHit(
+            chunk_id="chunk-1",
+            source_id=" transcript-julia",
+            text="MEETING TRANSCRIPT",
+            score=0.0,
+            position=0,
+        ),
+    ]
+    _patch_index(monkeypatch, hits)
+    session = AsyncMock()
+    session.execute = AsyncMock(side_effect=[_matter_result(_matter_without_documents())])
+
+    async with _client(session) as client:
+        response = await client.get(
+            "/api/v1/corpus/documents/transcript-julia/text",
+            params={"matter_id": "matter-1"},
+        )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert UUID(body["matter_id"]) == MATTER_ID
+    assert body["source_id"] == "transcript-julia"
+    assert body["document_id"] is None
+    assert body["document_version_id"] is None
+    assert body["title"] == "transcript-julia"
+    assert body["segment_count"] == 2
+    assert body["text"] == "MEETING TRANSCRIPT\n\nSecond paragraph."
+
+
+@pytest.mark.anyio
+async def test_document_text_strips_whitespace_from_source_id_param(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    hits = [
+        VectorHit(
+            chunk_id="chunk-1",
+            source_id="transcript-julia",
+            text="MEETING TRANSCRIPT",
+            score=0.0,
+            position=0,
+        ),
+    ]
+    _patch_index(monkeypatch, hits)
+    session = AsyncMock()
+    session.execute = AsyncMock(side_effect=[_matter_result(_matter_without_documents())])
+
+    async with _client(session) as client:
+        response = await client.get(
+            "/api/v1/corpus/documents/%20transcript-julia%20/text",
+            params={"matter_id": "matter-1"},
+        )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["source_id"] == "transcript-julia"
+    assert body["text"] == "MEETING TRANSCRIPT"

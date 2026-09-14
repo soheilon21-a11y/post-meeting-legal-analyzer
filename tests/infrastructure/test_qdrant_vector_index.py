@@ -15,6 +15,7 @@ def _chunk(
     text: str,
     vector: tuple[float, ...],
     source_id: str = "doc-1",
+    position: int | None = None,
 ) -> IndexedChunk:
     return IndexedChunk(
         chunk_id=chunk_id,
@@ -22,6 +23,7 @@ def _chunk(
         source_id=source_id,
         text=text,
         vector=vector,
+        position=position,
     )
 
 
@@ -120,3 +122,38 @@ async def test_dimension_mismatch_raises_processing_error(in_memory_client: Qdra
 def test_point_id_is_deterministic() -> None:
     assert point_id_for_chunk("chunk-a") == point_id_for_chunk("chunk-a")
     assert point_id_for_chunk("chunk-a") != point_id_for_chunk("chunk-b")
+
+
+@pytest.mark.anyio
+async def test_scroll_by_matter_returns_all_points_for_that_matter(
+    in_memory_client: QdrantClient,
+) -> None:
+    index = QdrantVectorIndex("legal_corpus", dimension=3, client=in_memory_client)
+
+    await index.upsert(
+        [
+            _chunk("chunk-a", "matter-1", "First.", (1.0, 0.0, 0.0), position=0),
+            _chunk("chunk-b", "matter-1", "Second.", (0.0, 1.0, 0.0), position=1),
+            _chunk("chunk-c", "matter-2", "Other matter.", (0.0, 0.0, 1.0)),
+        ]
+    )
+
+    hits = await index.scroll_by_matter("matter-1")
+
+    assert sorted(hit.chunk_id for hit in hits) == ["chunk-a", "chunk-b"]
+    by_id = {hit.chunk_id: hit for hit in hits}
+    assert by_id["chunk-a"].position == 0
+    assert by_id["chunk-b"].position == 1
+    assert by_id["chunk-a"].source_id == "doc-1"
+
+
+@pytest.mark.anyio
+async def test_scroll_by_matter_on_missing_collection_returns_empty(
+    in_memory_client: QdrantClient,
+) -> None:
+    index = QdrantVectorIndex("legal_corpus", dimension=3, client=in_memory_client)
+
+    hits = await index.scroll_by_matter("matter-1")
+
+    assert hits == ()
+    assert not in_memory_client.collection_exists("legal_corpus")

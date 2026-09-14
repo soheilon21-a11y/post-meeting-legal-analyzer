@@ -27,3 +27,6 @@ class VectorIndexPort(Protocol):
         score_threshold: float | None = None,
     ) -> tuple[VectorHit, ...]:
         """Return the closest indexed chunks for the query vector."""
+
+    async def scroll_by_matter(self, matter_id: str) -> tuple[VectorHit, ...]:
+        """Return every indexed chunk stored for a matter (no similarity search)."""
