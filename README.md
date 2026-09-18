@@ -12,6 +12,16 @@ Privacy-first LegalTech platform for analyzing legal meeting outputs using local
 - **Traceability & auditability**: audit event system with request IDs and timing middleware
 - **Compliance**: domain invariant validation and explicit state transitions
 
+## Features
+
+- 📤 Upload meeting transcripts or contracts as files (PDF, DOCX, TXT, MD) — or paste text
+- 🧠 Extract obligations, risks, and action items — from the client's perspective, with risk levels
+- 🔗 Verbatim citations from both the meeting transcript AND the indexed reference contract — and it flags when the two differ
+- ✏️ AI-assisted redlining: the model proposes clause changes, but nothing is applied until the attorney approves or rejects it — human-in-the-loop by design
+- 🔐 No tokens or logins for daily use — actions are attributed to the matter owner and stamped into a tamper-evident, hash-chained audit trail
+- 📄 Download the result as a professional PDF report (analysis + redline review)
+- 📖 Download the extracted text of any indexed corpus document
+
 ## Quick Start
 
 ### Prerequisites
@@ -103,6 +113,8 @@ pytest
 # Run tests with coverage
 pytest --cov=app --cov-report=term-missing
 ```
+
+Test suite: 284 tests passing.
 
 ## License
 
