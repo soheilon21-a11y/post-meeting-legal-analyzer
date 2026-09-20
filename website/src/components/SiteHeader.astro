@@ -8,13 +8,15 @@ import { name, githubUrl, href } from "../config";
 import Icon from "./Icon.astro";
 import LangToggle from "./LangToggle.astro";
 import en from "../content/strings/en.json";
+import de from "../content/strings/de.json";
 
 interface Props {
   lang?: "en" | "de";
 }
 
 const { lang = "en" } = Astro.props;
-const nav = en.nav;
+// German nav hrefs point at the /de/ page anchors; English ones at "/".
+const nav = lang === "de" ? de.nav : en.nav;
 ---
 
 <header class="border-b border-border bg-bg">

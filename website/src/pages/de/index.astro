@@ -1,33 +1,38 @@
 ---
+/**
+ * German landing page — full parity with the English landing page.
+ * Every section is the same component as "/", rendered with lang="de",
+ * which selects the German strings from de.json.
+ */
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Hero from "../../components/home/Hero.astro";
+import Problem from "../../components/home/Problem.astro";
+import HowItWorks from "../../components/home/HowItWorks.astro";
+import Features from "../../components/home/Features.astro";
+import Architecture from "../../components/home/Architecture.astro";
+import Privacy from "../../components/home/Privacy.astro";
+import OpenSource from "../../components/home/OpenSource.astro";
+import About from "../../components/home/About.astro";
+import Contact from "../../components/home/Contact.astro";
 import { href } from "../../config";
 import de from "../../content/strings/de.json";
-import en from "../../content/strings/en.json";
 
-const meta = en.meta;
+const { deTitle, deDescription } = de.meta;
 ---
 
 <BaseLayout
-  title={meta.deTitle}
-  description={meta.deDescription}
+  title={deTitle}
+  description={deDescription}
   lang="de"
   canonicalPath={href("/de/")}
 >
   <Hero lang="de" />
-
-  <!-- DRAFT - pending human review -->
-  <section class="section pt-0">
-    <div class="container-page">
-      <div class="card p-6">
-        <p class="text-ink">{de.stub.notice}</p>
-        <a
-          href={href("/")}
-          class="mt-4 inline-block rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white no-underline hover:bg-accent-dark"
-        >
-          {de.stub.cta}
-        </a>
-      </div>
-    </div>
-  </section>
+  <Problem lang="de" />
+  <HowItWorks lang="de" />
+  <Features lang="de" />
+  <Architecture lang="de" />
+  <Privacy lang="de" />
+  <OpenSource lang="de" />
+  <About lang="de" />
+  <Contact lang="de" />
 </BaseLayout>

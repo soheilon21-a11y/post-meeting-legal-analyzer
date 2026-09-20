@@ -2,8 +2,14 @@
 import SectionHeading from "../SectionHeading.astro";
 import Icon from "../Icon.astro";
 import en from "../../content/strings/en.json";
+import de from "../../content/strings/de.json";
 
-const t = en.features;
+interface Props {
+  lang?: "en" | "de";
+}
+
+const { lang = "en" } = Astro.props;
+const t = lang === "de" ? de.features : en.features;
 ---
 
 <section id="features" class="section">

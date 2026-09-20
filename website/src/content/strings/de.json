@@ -1,4 +1,63 @@
 {
+  "meta": {
+    "homeTitle": "Mithra — Post-Meeting Legal Analyzer",
+    "homeTitle_draft": "DRAFT - pending human review",
+    "homeDescription": "Mithra analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
+    "homeDescription_draft": "DRAFT - pending human review",
+    "deTitle": "Mithra — Post-Meeting Legal Analyzer (Deutsch)",
+    "deTitle_draft": "DRAFT - pending human review",
+    "deDescription": "Mithra analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
+    "deDescription_draft": "DRAFT - pending human review",
+    "impressumTitle": "Impressum — Mithra",
+    "impressumTitle_draft": "DRAFT - pending human review",
+    "impressumDescription": "Impressum der Mithra-Website.",
+    "impressumDescription_draft": "DRAFT - pending human review",
+    "datenschutzTitle": "Datenschutzerklärung — Mithra",
+    "datenschutzTitle_draft": "DRAFT - pending human review",
+    "datenschutzDescription": "Datenschutzerklärung der Mithra-Website.",
+    "datenschutzDescription_draft": "DRAFT - pending human review",
+    "notFoundTitle": "Seite nicht gefunden — Mithra",
+    "notFoundTitle_draft": "DRAFT - pending human review",
+    "notFoundDescription": "Die angeforderte Seite wurde nicht gefunden.",
+    "notFoundDescription_draft": "DRAFT - pending human review"
+  },
+  "nav": [
+    {
+      "label": "So funktioniert es",
+      "href": "/de/#how-it-works",
+      "_draft": "DRAFT - pending human review"
+    },
+    {
+      "label": "Funktionen",
+      "href": "/de/#features",
+      "_draft": "DRAFT - pending human review"
+    },
+    {
+      "label": "Architektur",
+      "href": "/de/#architecture",
+      "_draft": "DRAFT - pending human review"
+    },
+    {
+      "label": "Datenschutz",
+      "href": "/de/#privacy",
+      "_draft": "DRAFT - pending human review"
+    },
+    {
+      "label": "Open Source",
+      "href": "/de/#open-source",
+      "_draft": "DRAFT - pending human review"
+    },
+    {
+      "label": "Über uns",
+      "href": "/de/#about",
+      "_draft": "DRAFT - pending human review"
+    },
+    {
+      "label": "Kontakt",
+      "href": "/de/#contact",
+      "_draft": "DRAFT - pending human review"
+    }
+  ],
   "hero": {
     "kicker": "Open Source · MIT-Lizenz",
     "kicker_draft": "DRAFT - pending human review",
@@ -7,30 +66,277 @@
     "titleRest": "— Post-Meeting Legal Analyzer",
     "titleRest_draft": "DRAFT - pending human review",
     "tagline": "Rechts-KI. Lokal. Belegt.",
-    "tagline_draft": "DRAFT - pending human review",
     "subheadline": "Mithra analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
-    "subheadline_draft": "DRAFT - pending human review",
     "ctaPrimary": "Auf GitHub ansehen",
-    "ctaPrimary_draft": "DRAFT - pending human review",
     "ctaSecondary": "So funktioniert es",
-    "ctaSecondary_draft": "DRAFT - pending human review",
-    "trustBar": {
-      "local": "100 % lokal",
-      "local_draft": "DRAFT - pending human review",
-      "license": "MIT",
-      "license_draft": "DRAFT - pending human review",
-      "tests": "{count} Tests",
-      "tests_draft": "DRAFT - pending human review"
+    "artifact": {
+      "findingLabel": "Finding",
+      "findingTitle": "Liability cap conflicts with the master agreement",
+      "riskChip": "High risk",
+      "transcriptLabel": "Transcript",
+      "transcriptQuote": "“We agreed the supplier’s liability stays uncapped for direct damages.”",
+      "contractLabel": "Contract",
+      "contractQuote": "“Liability is limited to fees paid in the preceding twelve months.”",
+      "discrepancy": "Discrepancy flagged",
+      "approve": "Approve",
+      "reject": "Reject"
     }
   },
-  "stub": {
-    "notice": "Diese Seite wird derzeit übersetzt. Der vollständige Inhalt ist auf Englisch verfügbar.",
-    "notice_draft": "DRAFT - pending human review",
-    "cta": "Zur englischen Seite",
-    "cta_draft": "DRAFT - pending human review"
+  "trustBar": {
+    "local": "100 % lokal",
+    "license": "MIT",
+    "tests": "{count} Tests"
+  },
+  "problem": {
+    "kicker": "Das Problem",
+    "kicker_draft": "DRAFT - pending human review",
+    "title": "Kanzleien können Mandantendaten nicht in externe KI-Dienste einfügen",
+    "title_draft": "DRAFT - pending human review",
+    "lede": "Externe KI-Assistenten sind schnell. Doch vertrauliche Mandatsdaten und unbelegte Antworten sind Risiken, die eine Kanzlei nicht tragen kann.",
+    "lede_draft": "DRAFT - pending human review",
+    "cards": [
+      {
+        "title": "Vertraulichkeit der Mandanten",
+        "body": "Wer privilegierte Mandatsdaten in einen externen KI-Dienst einfügt, riskiert die Verletzung der anwaltlichen Verschwiegenheit und der DSGVO. Dieser Fehler lässt sich nicht rückgängig machen.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "title": "Unbelegte Ergebnisse sind unbrauchbar",
+        "body": "Eine erfundene Fundstelle kann keine Rechtsberatung stützen. Ein unbelegter Befund ist schlechter als gar kein Befund.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "title": "Automatisierung ohne Verantwortlichkeit",
+        "body": "Ohne revisionssicheren Audit-Trail und ohne menschliche Freigabe kann niemand das Ergebnis verantworten, wenn es hinterfragt wird.",
+        "_draft": "DRAFT - pending human review"
+      }
+    ]
+  },
+  "how": {
+    "kicker": "So funktioniert es",
+    "kicker_draft": "DRAFT - pending human review",
+    "title": "Vom Protokoll zur freigegebenen Analyse",
+    "title_draft": "DRAFT - pending human review",
+    "lede": "Drei Schritte, alle auf Ihrem Rechner.",
+    "lede_draft": "DRAFT - pending human review",
+    "steps": [
+      {
+        "num": "01",
+        "title": "Mandat indexieren",
+        "body": "Der Vertrag wird lokal zerlegt und eingebettet und anschließend in Qdrant gespeichert. Kein Text verlässt den Rechner.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "num": "02",
+        "title": "Protokoll analysieren",
+        "body": "Mithra extrahiert Pflichten, Risiken und Aufgaben. Es fügt wörtliche Belege aus beiden Quellen hinzu und markiert Abweichungen.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "num": "03",
+        "title": "Anwalt entscheidet",
+        "body": "Jedes KI-Redlining erfordert eine ausdrückliche Freigabe oder Ablehnung. Jede Entscheidung wird in den Audit-Trail geschrieben.",
+        "_draft": "DRAFT - pending human review"
+      }
+    ]
+  },
+  "features": {
+    "kicker": "Funktionen",
+    "kicker_draft": "DRAFT - pending human review",
+    "title": "Gebaut für vertrauliche Mandate.",
+    "lede": "Alles, was nötig ist, um aus einer Besprechung eine belastbare, belegte Analyse zu machen.",
+    "lede_draft": "DRAFT - pending human review",
+    "cards": [
+      {
+        "icon": "doc",
+        "title": "Upload in mehreren Formaten",
+        "body": "PDF, DOCX, TXT und Markdown — oder Text direkt einfügen.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "icon": "scale",
+        "title": "Pflichten und Risiken",
+        "body": "Aus Sicht des Mandanten extrahiert, jeweils mit eigener Risikostufe.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "icon": "quote",
+        "title": "Wörtliche Doppelbelege",
+        "body": "Zitate aus dem Besprechungsprotokoll und aus dem indexierten Vertrag. Abweichungen werden markiert.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "icon": "check",
+        "title": "Human-in-the-Loop-Redlining",
+        "body": "Das Modell schlägt vor. Nichts wird übernommen, bis der Anwalt zustimmt oder ablehnt.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "icon": "lock",
+        "title": "Zuordnung zum Mandatsinhaber",
+        "body": "Keine täglichen Tokens, keine Logins. Jede Handlung wird dem Mandatsinhaber zugeordnet.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "icon": "audit-chain",
+        "title": "Revisionssicherer Audit-Trail",
+        "body": "Eine hashverkettete Aufzeichnung jeder Handlung, jederzeit nachprüfbar.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "icon": "pdf",
+        "title": "Professionelle PDF-Berichte",
+        "body": "Die Analyse und die Redlining-Prüfung lassen sich als übersichtlicher PDF-Bericht exportieren.",
+        "_draft": "DRAFT - pending human review"
+      },
+      {
+        "icon": "shield",
+        "title": "Belegprüfung",
+        "body": "Belege werden gegen echte Dokument-IDs geprüft. Erfundene Quellen werden abgelehnt.",
+        "_draft": "DRAFT - pending human review"
+      }
+    ]
+  },
+  "architecture": {
+    "kicker": "Architektur und Sicherheit",
+    "kicker_draft": "DRAFT - pending human review",
+    "title": "Eine abgeschlossene Umgebung. Nichts verlässt sie.",
+    "lede": "Alle Dienste laufen innerhalb einer einzigen lokalen Docker-Compose-Umgebung.",
+    "lede_draft": "DRAFT - pending human review",
+    "diagramTitle": "Mithra läuft vollständig auf Ihrem Rechner",
+    "diagramTitle_draft": "DRAFT - pending human review",
+    "diagramDesc": "Ein Schaubild der lokalen Dienste. Ein Browser- oder API-Client ruft einen FastAPI-Dienst auf. FastAPI spricht mit Ollama für Sprach- und Einbettungsmodelle, mit Qdrant für die Vektorsuche, mit PostgreSQL für relationale Daten, mit Redis für Warteschlangen und mit MinIO für Objektspeicher. Alle Dienste laufen innerhalb einer Grenze mit der Bezeichnung „Ihr Rechner — Docker Compose“. Außerhalb der Grenze steht eine durchgestrichene Wolke mit der Bezeichnung „keine Cloud-Aufrufe“.",
+    "diagramDesc_draft": "DRAFT - pending human review",
+    "boundaryLabel": "Ihr Rechner — Docker Compose",
+    "boundaryLabel_draft": "DRAFT - pending human review",
+    "noCloudLabel": "keine Cloud-Aufrufe",
+    "noCloudLabel_draft": "DRAFT - pending human review",
+    "clientLabel": "Browser / API-Client",
+    "clientLabel_draft": "DRAFT - pending human review",
+    "notes": [
+      "Modell mit einer Konfigurationszeile austauschbar.",
+      "Revisionssicherer Audit-Trail für jede Handlung.",
+      "Belegprüfung gegen echte Dokument-IDs."
+    ],
+    "notes_draft": [
+      "DRAFT - pending human review",
+      "DRAFT - pending human review",
+      "DRAFT - pending human review"
+    ]
+  },
+  "privacy": {
+    "kicker": "Datenschutz und Compliance",
+    "kicker_draft": "DRAFT - pending human review",
+    "title": "Datenschutz durch Architektur, nicht durch Datenschutzerklärungen.",
+    "gdpr": {
+      "title": "Ausrichtung an der DSGVO",
+      "title_draft": "DRAFT - pending human review",
+      "body": "Da die Verarbeitung lokal erfolgt, gibt es keine Drittlandübermittlung. Die Datenminimierung ergibt sich aus der Architektur selbst. Mithra unterstützt Ihre Compliance-Arbeit, ersetzt sie jedoch nicht.",
+      "body_draft": "DRAFT - pending human review"
+    },
+    "aiAct": {
+      "title": "Ausrichtung am EU AI Act",
+      "title_draft": "DRAFT - pending human review",
+      "body": "Human-in-the-Loop ist Teil des Entwurfs. Jeder Befund ist transparent belegt, und der Audit-Trail ist vollständig. Die letzte Entscheidung trifft immer der Anwalt.",
+      "body_draft": "DRAFT - pending human review"
+    },
+    "notLegalAdvice": "Diese Website ist keine Rechtsberatung.",
+    "site": {
+      "title": "So schützt diese Website Ihre Privatsphäre",
+      "title_draft": "DRAFT - pending human review",
+      "lines": [
+        "Keine Analyse-Tools, keine Cookies, keine Tracker.",
+        "Nur Systemschriften — keine externen Anfragen.",
+        "Eine strikte Content-Security-Policy mit script-src 'none'.",
+        "Prüfen Sie es selbst: DevTools öffnen → Netzwerk und neu laden."
+      ],
+      "lines_draft": [
+        "DRAFT - pending human review",
+        "DRAFT - pending human review",
+        "DRAFT - pending human review",
+        "DRAFT - pending human review"
+      ]
+    }
+  },
+  "openSource": {
+    "kicker": "Open Source",
+    "kicker_draft": "DRAFT - pending human review",
+    "title": "MIT-lizenziert, offen entwickelt",
+    "title_draft": "DRAFT - pending human review",
+    "licenseLine": "Veröffentlicht unter der MIT-Lizenz — lesen, prüfen, selbst hosten.",
+    "licenseLine_draft": "DRAFT - pending human review",
+    "testsLine": "{count} Tests erfolgreich.",
+    "testsLine_draft": "DRAFT - pending human review",
+    "cta": "Auf GitHub mit Stern markieren",
+    "cta_draft": "DRAFT - pending human review",
+    "roadmapTitle": "Ausblick",
+    "roadmapTitle_draft": "DRAFT - pending human review",
+    "roadmapNote": "Unverbindliche Ankündigungen.",
+    "roadmapNote_draft": "DRAFT - pending human review",
+    "roadmap": [
+      "Deutsche Benutzeroberfläche für die Anwendung",
+      "Weitere Exportformate",
+      "Gehostete Dokumentation"
+    ],
+    "roadmap_draft": [
+      "DRAFT - pending human review",
+      "DRAFT - pending human review",
+      "DRAFT - pending human review"
+    ]
+  },
+  "about": {
+    "kicker": "Über uns",
+    "kicker_draft": "DRAFT - pending human review",
+    "title": "Warum der Name Mithra",
+    "title_draft": "DRAFT - pending human review",
+    "bioPlaceholder": "[Autorenbiografie — noch zu verfassen]",
+    "bioPlaceholder_draft": "DRAFT - pending human review",
+    "brandStory": "Mithra — ein altiranisches Wort für „Bündnis“: ein Versprechen, das gegeben, bezeugt und gehalten wird. Es ist eines der ältesten Wörter der persischen Sprache und die älteste Idee des Rechts. Wir haben dieses Werkzeug nach dieser Idee benannt — jede Vereinbarung verdient es, so gelesen zu werden, als käme es auf ihr Versprechen an.",
+    "dedication": "Dem Andenken meines Vaters Sohrab gewidmet."
+  },
+  "contact": {
+    "kicker": "Kontakt",
+    "kicker_draft": "DRAFT - pending human review",
+    "title": "Fragen, Fehler, Ideen?",
+    "title_draft": "DRAFT - pending human review",
+    "body": "Alles läuft über GitHub — bewusst ohne E-Mail-Adresse und ohne Kontaktformular.",
+    "body_draft": "DRAFT - pending human review",
+    "issuesCta": "Problem melden",
+    "issuesCta_draft": "DRAFT - pending human review",
+    "discussionsCta": "Diskussion starten",
+    "discussionsCta_draft": "DRAFT - pending human review"
   },
   "footer": {
-    "trust": "0 externe Anfragen · 0 Cookies · 0 Tracker",
-    "trust_draft": "DRAFT - pending human review"
+    "projectTitle": "Projekt",
+    "projectTitle_draft": "DRAFT - pending human review",
+    "repoLabel": "Repository",
+    "repoLabel_draft": "DRAFT - pending human review",
+    "siteLabel": "Website",
+    "siteLabel_draft": "DRAFT - pending human review",
+    "issuesLabel": "Issues",
+    "issuesLabel_draft": "DRAFT - pending human review",
+    "legalTitle": "Rechtliches",
+    "legalTitle_draft": "DRAFT - pending human review",
+    "impressumLabel": "Impressum",
+    "impressumLabel_draft": "DRAFT - pending human review",
+    "datenschutzLabel": "Datenschutzerklärung",
+    "datenschutzLabel_draft": "DRAFT - pending human review",
+    "licenseTitle": "Lizenz",
+    "licenseTitle_draft": "DRAFT - pending human review",
+    "licenseLabel": "MIT",
+    "licenseLabel_draft": "DRAFT - pending human review",
+    "trust": "0 externe Anfragen · 0 Cookies · 0 Tracker"
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "title_draft": "DRAFT - pending human review",
+    "body": "Die von Ihnen gesuchte Seite existiert nicht.",
+    "body_draft": "DRAFT - pending human review",
+    "homeCta": "Zur Startseite",
+    "homeCta_draft": "DRAFT - pending human review"
+  },
+  "placeholder": {
+    "line": "Diese Seite wird derzeit erstellt.",
+    "line_draft": "DRAFT - pending human review"
   }
 }
