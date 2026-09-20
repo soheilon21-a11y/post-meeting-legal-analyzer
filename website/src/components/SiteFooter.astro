@@ -1,0 +1,83 @@
+---
+/**
+ * Site footer: three link columns, legal links, license, then a full-width
+ * trust row. The trust claim ships only because the zero-external-request
+ * audit passes on the built output.
+ */
+import {
+  githubUrl,
+  githubIssuesUrl,
+  githubLicenseUrl,
+  href,
+  copyright,
+} from "../config";
+import en from "../content/strings/en.json";
+import de from "../content/strings/de.json";
+
+interface Props {
+  lang?: "en" | "de";
+}
+
+const { lang = "en" } = Astro.props;
+const t = en.footer;
+const trust = lang === "de" ? de.footer.trust : t.trust;
+
+const linkClass = "text-muted no-underline hover:text-accent";
+---
+
+<footer class="border-t border-border">
+  <div class="container-page py-12">
+    <div class="grid gap-8 sm:grid-cols-3">
+      <div>
+        <h2 class="text-sm font-semibold text-ink">{t.projectTitle}</h2>
+        <ul class="mt-3 space-y-2 text-sm">
+          <li>
+            <a class={linkClass} href={githubUrl} rel="noopener">
+              {t.repoLabel}
+            </a>
+          </li>
+          <li>
+            <a class={linkClass} href={href("/")}>{t.siteLabel}</a>
+          </li>
+          <li>
+            <a class={linkClass} href={githubIssuesUrl} rel="noopener">
+              {t.issuesLabel}
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-sm font-semibold text-ink">{t.legalTitle}</h2>
+        <ul class="mt-3 space-y-2 text-sm">
+          <li>
+            <a class={linkClass} href={href("/impressum/")}>
+              {t.impressumLabel}
+            </a>
+          </li>
+          <li>
+            <a class={linkClass} href={href("/datenschutz/")}>
+              {t.datenschutzLabel}
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-sm font-semibold text-ink">{t.licenseTitle}</h2>
+        <ul class="mt-3 space-y-2 text-sm">
+          <li>
+            <a class={linkClass} href={githubLicenseUrl} rel="noopener">
+              {t.licenseLabel}
+            </a>
+          </li>
+        </ul>
+        <p class="mt-3 text-sm text-muted">{copyright}</p>
+      </div>
+    </div>
+
+    <div class="mt-10 border-t border-border pt-6">
+      <p class="text-sm text-muted">{trust}</p>
+    </div>
+  </div>
+</footer>

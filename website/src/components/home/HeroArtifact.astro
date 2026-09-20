@@ -1,0 +1,104 @@
+---
+/**
+ * Decorative "analysis card" artifact for the hero.
+ *
+ * Purely presentational (aria-hidden) inline SVG that shows — without any
+ * imagery clichés — what the product produces: a finding with a risk chip,
+ * two verbatim citations (transcript ↔ contract), a flagged discrepancy, and
+ * an approve/reject decision. Static, ~3 KB, no client JS.
+ */
+import en from "../../content/strings/en.json";
+
+const t = en.hero.artifact;
+---
+
+<svg
+  viewBox="0 0 480 384"
+  width="480"
+  height="384"
+  role="presentation"
+  aria-hidden="true"
+  focusable="false"
+  class="h-auto w-full max-w-[30rem]"
+>
+  <!-- Card -->
+  <rect
+    x="1"
+    y="1"
+    width="478"
+    height="382"
+    rx="16"
+    fill="#ffffff"
+    stroke="#e4dccf"
+    stroke-width="2"></rect>
+
+  <!-- Finding label + title -->
+  <text x="28" y="42" class="font-mono" font-size="11" fill="#5a554c">
+    {t.findingLabel.toUpperCase()}
+  </text>
+  <text x="28" y="68" class="font-sans" font-size="16" font-weight="600" fill="#242220">
+    {t.findingTitle}
+  </text>
+
+  <!-- Risk chip -->
+  <rect x="336" y="26" width="116" height="28" rx="14" fill="#e7efea"></rect>
+  <circle cx="354" cy="40" r="5" fill="#9e3b2e"></circle>
+  <text x="366" y="44" class="font-sans" font-size="12" font-weight="600" fill="#242220">
+    {t.riskChip}
+  </text>
+
+  <line x1="28" y1="92" x2="452" y2="92" stroke="#e4dccf" stroke-width="1"></line>
+
+  <!-- Transcript citation -->
+  <rect x="28" y="108" width="4" height="58" rx="2" fill="#1e4b3c"></rect>
+  <text x="44" y="124" class="font-mono" font-size="11" fill="#1e4b3c">
+    {t.transcriptLabel.toUpperCase()}
+  </text>
+  <text x="44" y="146" class="font-sans" font-size="13" fill="#242220">
+    “We agreed the supplier’s liability stays uncapped
+  </text>
+  <text x="44" y="164" class="font-sans" font-size="13" fill="#242220">
+    for direct damages.”
+  </text>
+
+  <!-- Contract citation -->
+  <rect x="28" y="186" width="4" height="58" rx="2" fill="#1e4b3c"></rect>
+  <text x="44" y="202" class="font-mono" font-size="11" fill="#1e4b3c">
+    {t.contractLabel.toUpperCase()}
+  </text>
+  <text x="44" y="224" class="font-sans" font-size="13" fill="#242220">
+    “Liability is limited to fees paid in the preceding
+  </text>
+  <text x="44" y="242" class="font-sans" font-size="13" fill="#242220">
+    twelve months.”
+  </text>
+
+  <!-- Discrepancy marker -->
+  <path
+    d="M28 276l7 12h-14l7-12z"
+    fill="#9e3b2e"
+    stroke="#9e3b2e"
+    stroke-width="1"
+    stroke-linejoin="round"></path>
+  <text x="46" y="288" class="font-sans" font-size="13" font-weight="600" fill="#9e3b2e">
+    {t.discrepancy}
+  </text>
+
+  <!-- Decision buttons -->
+  <rect x="28" y="316" width="128" height="40" rx="8" fill="#1e4b3c"></rect>
+  <text x="92" y="341" text-anchor="middle" class="font-sans" font-size="13" font-weight="600" fill="#ffffff">
+    {t.approve}
+  </text>
+  <rect
+    x="168"
+    y="316"
+    width="112"
+    height="40"
+    rx="8"
+    fill="none"
+    stroke="#e4dccf"
+    stroke-width="2"></rect>
+  <text x="224" y="341" text-anchor="middle" class="font-sans" font-size="13" font-weight="600" fill="#242220">
+    {t.reject}
+  </text>
+</svg>

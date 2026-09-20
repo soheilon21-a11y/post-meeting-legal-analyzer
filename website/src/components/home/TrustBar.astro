@@ -1,0 +1,24 @@
+---
+/**
+ * Trust bar — "100% local · MIT · N tests". The test count comes from
+ * src/config.ts only; the label around it comes from the strings file.
+ */
+import Icon from "../Icon.astro";
+
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
+  {
+    items.map((label) => (
+      <li class="flex items-center gap-1.5">
+        <Icon name="check" size={16} class="text-accent" />
+        <span>{label}</span>
+      </li>
+    ))
+  }
+</ul>

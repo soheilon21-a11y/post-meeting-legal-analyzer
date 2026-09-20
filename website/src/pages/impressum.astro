@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { href } from "../config";
+import en from "../content/strings/en.json";
+---
+
+<BaseLayout
+  title={en.meta.impressumTitle}
+  description={en.meta.impressumDescription}
+  lang="de"
+  canonicalPath={href("/impressum/")}
+>
+  <section class="section">
+    <div class="container-page">
+      <h1 class="font-display text-h2 text-ink">Impressum</h1>
+      <p class="mt-4 text-muted">{en.placeholder.line}</p>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Hero from "../../components/home/Hero.astro";
+import { href } from "../../config";
+import de from "../../content/strings/de.json";
+import en from "../../content/strings/en.json";
+
+const meta = en.meta;
+---
+
+<BaseLayout
+  title={meta.deTitle}
+  description={meta.deDescription}
+  lang="de"
+  canonicalPath={href("/de/")}
+>
+  <Hero lang="de" />
+
+  <!-- DRAFT - pending human review -->
+  <section class="section pt-0">
+    <div class="container-page">
+      <div class="card p-6">
+        <p class="text-ink">{de.stub.notice}</p>
+        <a
+          href={href("/")}
+          class="mt-4 inline-block rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white no-underline hover:bg-accent-dark"
+        >
+          {de.stub.cta}
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

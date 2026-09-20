@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "homeTitle": "Mithra — Post-Meeting Legal Analyzer",
+    "homeDescription": "Mithra analyzes contracts and meeting transcripts 100% locally — every finding cited, every action audited, nothing leaves your machine.",
+    "deTitle": "Mithra — Post-Meeting Legal Analyzer (Deutsch)",
+    "deDescription": "Mithra analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
+    "impressumTitle": "Impressum — Mithra",
+    "impressumDescription": "Impressum der Mithra-Website.",
+    "datenschutzTitle": "Datenschutzerklärung — Mithra",
+    "datenschutzDescription": "Datenschutzerklärung der Mithra-Website.",
+    "notFoundTitle": "Page not found — Mithra",
+    "notFoundDescription": "The requested page could not be found."
+  },
+  "nav": [
+    { "label": "How it works", "href": "/#how-it-works" },
+    { "label": "Features", "href": "/#features" },
+    { "label": "Architecture", "href": "/#architecture" },
+    { "label": "Privacy", "href": "/#privacy" },
+    { "label": "Open Source", "href": "/#open-source" },
+    { "label": "About", "href": "/#about" },
+    { "label": "Contact", "href": "/#contact" }
+  ],
+  "hero": {
+    "kicker": "Open source · MIT licensed",
+    "titleBrand": "Mithra",
+    "titleRest": "— Post-Meeting Legal Analyzer",
+    "tagline": "Legal AI. 100% local. 100% cited.",
+    "subheadline": "Mithra analyzes contracts and meeting transcripts 100% locally — every finding cited, every action audited, nothing leaves your machine.",
+    "ctaPrimary": "View on GitHub",
+    "ctaSecondary": "How it works",
+    "artifact": {
+      "findingLabel": "Finding",
+      "findingTitle": "Liability cap conflicts with the master agreement",
+      "riskChip": "High risk",
+      "transcriptLabel": "Transcript",
+      "transcriptQuote": "“We agreed the supplier’s liability stays uncapped for direct damages.”",
+      "contractLabel": "Contract",
+      "contractQuote": "“Liability is limited to fees paid in the preceding twelve months.”",
+      "discrepancy": "Discrepancy flagged",
+      "approve": "Approve",
+      "reject": "Reject"
+    }
+  },
+  "trustBar": {
+    "local": "100% local",
+    "license": "MIT",
+    "tests": "{count} tests"
+  },
+  "problem": {
+    "kicker": "The problem",
+    "title": "Law firms can't paste client data into cloud AI",
+    "lede": "Cloud assistants are fast, but privileged matter data and unsourced answers are risks a practice cannot absorb.",
+    "cards": [
+      {
+        "title": "Client confidentiality",
+        "body": "Pasting privileged matter data into a cloud AI service creates privilege and GDPR exposure that cannot be undone."
+      },
+      {
+        "title": "Uncited output is unusable",
+        "body": "A hallucinated citation cannot support legal advice — an unsourced finding is worse than no finding at all."
+      },
+      {
+        "title": "Automation without accountability",
+        "body": "No audit trail and no human sign-off means nobody can stand behind the result when it is questioned."
+      }
+    ]
+  },
+  "how": {
+    "kicker": "How it works",
+    "title": "From transcript to signed-off analysis",
+    "lede": "Three steps, all on your machine.",
+    "steps": [
+      {
+        "num": "01",
+        "title": "Index the matter",
+        "body": "The contract is chunked and embedded locally, then stored in Qdrant — no text ever leaves the machine."
+      },
+      {
+        "num": "02",
+        "title": "Analyze the transcript",
+        "body": "Mithra extracts obligations, risks, and action items, attaches verbatim dual citations, and flags discrepancies."
+      },
+      {
+        "num": "03",
+        "title": "Attorney decides",
+        "body": "Every AI redline requires an explicit approve or reject — each decision is stamped into the audit trail."
+      }
+    ]
+  },
+  "features": {
+    "kicker": "Features",
+    "title": "Built for privileged work",
+    "lede": "Everything needed to turn a meeting into a defensible, cited analysis.",
+    "cards": [
+      {
+        "icon": "doc",
+        "title": "Multi-format upload",
+        "body": "PDF, DOCX, TXT, and Markdown — or paste text directly."
+      },
+      {
+        "icon": "scale",
+        "title": "Obligations & risks",
+        "body": "Extracted from the client's perspective, each with a risk level."
+      },
+      {
+        "icon": "quote",
+        "title": "Verbatim dual citations",
+        "body": "Quotes from the transcript and the indexed contract, with discrepancy flags when they differ."
+      },
+      {
+        "icon": "check",
+        "title": "Human-in-the-loop redlining",
+        "body": "The model proposes; nothing is applied until the attorney approves or rejects it."
+      },
+      {
+        "icon": "lock",
+        "title": "Matter-owner attribution",
+        "body": "No daily tokens or logins — every action is attributed to the matter owner."
+      },
+      {
+        "icon": "audit-chain",
+        "title": "Tamper-evident audit trail",
+        "body": "A hash-chained record of every action, verifiable after the fact."
+      },
+      {
+        "icon": "pdf",
+        "title": "Professional PDF reports",
+        "body": "Export the analysis and the redline review as a clean PDF report."
+      },
+      {
+        "icon": "shield",
+        "title": "Citation validation",
+        "body": "Sources are checked against real document IDs — invented citations are refused."
+      }
+    ]
+  },
+  "architecture": {
+    "kicker": "Architecture & security",
+    "title": "One bounded box. Nothing leaves it.",
+    "lede": "Every service runs inside a single local Docker Compose boundary.",
+    "diagramTitle": "Mithra runs entirely on your machine",
+    "diagramDesc": "A diagram of the local stack. A browser or API client calls a FastAPI service. FastAPI talks to Ollama for language and embedding models, Qdrant for vector search, PostgreSQL for relational data, Redis for queues, and MinIO for object storage. All of these run inside one boundary labelled “Your machine — Docker Compose”. Outside the boundary a crossed-out cloud is labelled “no cloud calls”.",
+    "boundaryLabel": "Your machine — Docker Compose",
+    "noCloudLabel": "no cloud calls",
+    "clientLabel": "Browser / API client",
+    "notes": [
+      "Model swappable with one config line.",
+      "Hash-chained audit trail for every action.",
+      "Citation validation against real document IDs."
+    ]
+  },
+  "privacy": {
+    "kicker": "Privacy & compliance",
+    "title": "Privacy by architecture, not by policy",
+    "gdpr": {
+      "title": "GDPR alignment",
+      "body": "Because processing happens locally, there is no third-country transfer and data minimization is enforced by the architecture itself. Mithra supports your compliance work — it does not replace it."
+    },
+    "aiAct": {
+      "title": "EU AI Act alignment",
+      "body": "Human-in-the-loop by design, transparent citations for every finding, and a complete audit trail. The attorney always makes the final call."
+    },
+    "notLegalAdvice": "This website is not legal advice.",
+    "site": {
+      "title": "How this site respects your privacy",
+      "lines": [
+        "No analytics, no cookies, no trackers.",
+        "System fonts only — zero external requests.",
+        "A strict Content-Security-Policy with script-src 'none'.",
+        "Verify it yourself: open DevTools → Network and reload."
+      ]
+    }
+  },
+  "openSource": {
+    "kicker": "Open source",
+    "title": "MIT licensed, built in the open",
+    "licenseLine": "Released under the MIT license — read it, audit it, self-host it.",
+    "testsLine": "{count} tests passing.",
+    "cta": "Star on GitHub",
+    "roadmapTitle": "Roadmap teaser",
+    "roadmapNote": "Teasers — not commitments.",
+    "roadmap": [
+      "German UI for the application",
+      "Additional export formats",
+      "Hosted documentation"
+    ]
+  },
+  "about": {
+    "kicker": "About",
+    "title": "Why the name Mithra",
+    "bioPlaceholder": "[Author bio — to be written]",
+    "brandStory": "Mithra — an ancient Persian word meaning 'covenant': a promise made, witnessed, and kept. It is one of the oldest words in the Persian language and the oldest idea in law. We named this tool after that idea — every agreement deserves to be read as if its promise matters.",
+    "dedication": "Dedicated to the memory of my father, Sohrab."
+  },
+  "contact": {
+    "kicker": "Contact",
+    "title": "Questions, bugs, ideas?",
+    "body": "Everything happens on GitHub — no email address and no contact form, by design.",
+    "issuesCta": "Open an issue",
+    "discussionsCta": "Start a discussion"
+  },
+  "footer": {
+    "projectTitle": "Project",
+    "repoLabel": "Repository",
+    "siteLabel": "Pages site",
+    "issuesLabel": "Issues",
+    "legalTitle": "Legal",
+    "impressumLabel": "Impressum",
+    "datenschutzLabel": "Datenschutzerklärung",
+    "licenseTitle": "License",
+    "licenseLabel": "MIT",
+    "trust": "0 external requests · 0 cookies · 0 trackers"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you were looking for does not exist.",
+    "homeCta": "Back to homepage"
+  },
+  "placeholder": {
+    "line": "Diese Seite wird derzeit erstellt."
+  }
+}

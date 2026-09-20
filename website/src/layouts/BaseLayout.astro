@@ -1,0 +1,80 @@
+---
+/**
+ * Shared document shell.
+ *
+ * - SEO / Open Graph meta, canonical link, referrer policy.
+ * - Strict Content-Security-Policy meta, injected in production builds only so
+ *   the Astro dev server and its tooling are not blocked during development.
+ * - Renders the site header and footer by default; both are overridable slots.
+ */
+import "../styles/global.css";
+import { siteUrl, accentColor, href } from "../config";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  lang?: "en" | "de";
+  /** Root-relative path (already base-prefixed via `href()`); omit to skip canonical. */
+  canonicalPath?: string;
+}
+
+const { title, description, lang = "en", canonicalPath } = Astro.props;
+
+const canonical = canonicalPath
+  ? new URL(canonicalPath, siteUrl).href
+  : undefined;
+
+// `frame-ancestors` is intentionally omitted: it is ignored inside a <meta> tag
+// per the CSP spec (it only works as a header). See DEPLOY.md.
+const csp = [
+  "default-src 'self'",
+  "script-src 'none'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'none'",
+].join("; ");
+
+const isProd = import.meta.env.PROD;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {isProd && <meta http-equiv="Content-Security-Policy" content={csp} />}
+    <meta name="referrer" content="no-referrer" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta name="theme-color" content={accentColor} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mithra" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="icon" type="image/svg+xml" href={href("/favicon.svg")} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot name="header">
+      <SiteHeader lang={lang} />
+    </slot>
+    <main id="main">
+      <slot />
+    </main>
+    <slot name="footer">
+      <SiteFooter lang={lang} />
+    </slot>
+  </body>
+</html>

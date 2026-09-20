@@ -1,0 +1,39 @@
+---
+/**
+ * EN | DE language switch — plain <a> links only, zero JavaScript.
+ * Both links are base-path-safe via `href()`.
+ */
+import { href } from "../config";
+
+interface Props {
+  lang?: "en" | "de";
+}
+
+const { lang = "en" } = Astro.props;
+---
+
+<div class="flex items-center gap-2 text-sm" aria-label="Language selection">
+  <a
+    href={href("/")}
+    hreflang="en"
+    class:list={[
+      "font-semibold no-underline",
+      lang === "en" ? "text-accent" : "text-muted hover:text-accent",
+    ]}
+    aria-current={lang === "en" ? "true" : undefined}
+  >
+    EN
+  </a>
+  <span aria-hidden="true" class="text-border">|</span>
+  <a
+    href={href("/de/")}
+    hreflang="de"
+    class:list={[
+      "font-semibold no-underline",
+      lang === "de" ? "text-accent" : "text-muted hover:text-accent",
+    ]}
+    aria-current={lang === "de" ? "true" : undefined}
+  >
+    DE
+  </a>
+</div>

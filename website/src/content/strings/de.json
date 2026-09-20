@@ -1,0 +1,36 @@
+{
+  "hero": {
+    "kicker": "Open Source · MIT-Lizenz",
+    "kicker_draft": "DRAFT - pending human review",
+    "titleBrand": "Mithra",
+    "titleBrand_draft": "DRAFT - pending human review",
+    "titleRest": "— Post-Meeting Legal Analyzer",
+    "titleRest_draft": "DRAFT - pending human review",
+    "tagline": "Rechts-KI. Lokal. Belegt.",
+    "tagline_draft": "DRAFT - pending human review",
+    "subheadline": "Mithra analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
+    "subheadline_draft": "DRAFT - pending human review",
+    "ctaPrimary": "Auf GitHub ansehen",
+    "ctaPrimary_draft": "DRAFT - pending human review",
+    "ctaSecondary": "So funktioniert es",
+    "ctaSecondary_draft": "DRAFT - pending human review",
+    "trustBar": {
+      "local": "100 % lokal",
+      "local_draft": "DRAFT - pending human review",
+      "license": "MIT",
+      "license_draft": "DRAFT - pending human review",
+      "tests": "{count} Tests",
+      "tests_draft": "DRAFT - pending human review"
+    }
+  },
+  "stub": {
+    "notice": "Diese Seite wird derzeit übersetzt. Der vollständige Inhalt ist auf Englisch verfügbar.",
+    "notice_draft": "DRAFT - pending human review",
+    "cta": "Zur englischen Seite",
+    "cta_draft": "DRAFT - pending human review"
+  },
+  "footer": {
+    "trust": "0 externe Anfragen · 0 Cookies · 0 Tracker",
+    "trust_draft": "DRAFT - pending human review"
+  }
+}

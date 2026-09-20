@@ -1,0 +1,24 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+import en from "../../content/strings/en.json";
+
+const t = en.about;
+---
+
+<section id="about" class="section">
+  <div class="container-page">
+    <SectionHeading kicker={t.kicker} title={t.title} />
+
+    <!-- Bio is an explicit placeholder, to be written by the author. -->
+    <p class="mt-8 text-sm italic text-muted">{t.bioPlaceholder}</p>
+
+    <p class="mt-6 measure text-lg leading-relaxed text-ink">
+      {t.brandStory}
+    </p>
+
+    <!-- Dedication, set quietly in serif italic after generous whitespace. -->
+    <p class="mt-16 font-display text-xl italic text-muted">
+      {t.dedication}
+    </p>
+  </div>
+</section>

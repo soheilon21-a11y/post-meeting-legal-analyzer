@@ -1,0 +1,222 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+import en from "../../content/strings/en.json";
+
+const t = en.architecture;
+---
+
+<section id="architecture" class="section">
+  <div class="container-page">
+    <SectionHeading kicker={t.kicker} title={t.title} lede={t.lede} />
+
+    <div class="mt-12 grid gap-8 lg:grid-cols-[2fr_1fr] lg:items-start">
+      <!-- Diagram: one bounded local stack, no cloud calls. -->
+      <svg
+        viewBox="0 0 680 460"
+        width="680"
+        height="460"
+        role="img"
+        aria-labelledby="arch-title arch-desc"
+        class="card h-auto w-full p-2"
+      >
+        <title id="arch-title">{t.diagramTitle}</title>
+        <desc id="arch-desc">{t.diagramDesc}</desc>
+
+        <defs>
+          <marker
+            id="arch-arrow"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
+          >
+            <path d="M0 0L10 5L0 10z" fill="#1e4b3c"></path>
+          </marker>
+        </defs>
+
+        <!-- Boundary -->
+        <rect
+          x="20"
+          y="20"
+          width="480"
+          height="420"
+          rx="16"
+          fill="#e7efea"
+          stroke="#1e4b3c"
+          stroke-width="2"
+          stroke-dasharray="7 6"></rect>
+        <text x="44" y="52" class="font-mono" font-size="12" fill="#1e4b3c">
+          {t.boundaryLabel}
+        </text>
+
+        <!-- Client -->
+        <rect
+          x="48"
+          y="84"
+          width="150"
+          height="52"
+          rx="10"
+          fill="#ffffff"
+          stroke="#e4dccf"
+          stroke-width="2"></rect>
+        <text
+          x="123"
+          y="106"
+          text-anchor="middle"
+          class="font-sans"
+          font-size="12"
+          fill="#242220">Browser /</text
+        >
+        <text
+          x="123"
+          y="124"
+          text-anchor="middle"
+          class="font-sans"
+          font-size="12"
+          fill="#242220">API client</text
+        >
+
+        <!-- Client -> FastAPI -->
+        <line
+          x1="198"
+          y1="110"
+          x2="242"
+          y2="110"
+          stroke="#1e4b3c"
+          stroke-width="2"
+          marker-end="url(#arch-arrow)"></line>
+
+        <!-- FastAPI -->
+        <rect x="246" y="82" width="140" height="56" rx="10" fill="#1e4b3c"
+        ></rect>
+        <text
+          x="316"
+          y="106"
+          text-anchor="middle"
+          class="font-sans"
+          font-size="14"
+          font-weight="600"
+          fill="#ffffff">FastAPI</text
+        >
+        <text
+          x="316"
+          y="124"
+          text-anchor="middle"
+          class="font-mono"
+          font-size="9"
+          fill="#ffffff">REST API</text
+        >
+
+        <!-- Bus to services -->
+        <line x1="316" y1="138" x2="316" y2="176" stroke="#1e4b3c" stroke-width="2"
+        ></line>
+        <line x1="72" y1="176" x2="448" y2="176" stroke="#1e4b3c" stroke-width="2"
+        ></line>
+
+        <!-- Service stubs -->
+        {
+          [72, 166, 260, 354, 448].map((cx) => (
+            <line
+              x1={cx}
+              y1="176"
+              x2={cx}
+              y2="196"
+              stroke="#1e4b3c"
+              stroke-width="2"
+            />
+          ))
+        }
+
+        <!-- Services -->
+        {
+          [
+            { x: 33, name: "Ollama", sub: "llama3" },
+            { x: 127, name: "Qdrant", sub: "vectors" },
+            { x: 221, name: "PostgreSQL", sub: "relational" },
+            { x: 315, name: "Redis", sub: "queues" },
+            { x: 409, name: "MinIO", sub: "objects" },
+          ].map((svc) => (
+            <>
+              <rect
+                x={svc.x}
+                y="196"
+                width="78"
+                height="78"
+                rx="8"
+                fill="#ffffff"
+                stroke="#e4dccf"
+                stroke-width="2"
+              />
+              <text
+                x={svc.x + 39}
+                y="232"
+                text-anchor="middle"
+                class="font-sans"
+                font-size="11"
+                font-weight="600"
+                fill="#242220"
+              >
+                {svc.name}
+              </text>
+              <text
+                x={svc.x + 39}
+                y="252"
+                text-anchor="middle"
+                class="font-mono"
+                font-size="9"
+                fill="#5a554c"
+              >
+                {svc.sub}
+              </text>
+            </>
+          ))
+        }
+        <text
+          x="260"
+          y="418"
+          text-anchor="middle"
+          class="font-mono"
+          font-size="9"
+          fill="#5a554c">llama3 · nomic-embed-text</text
+        >
+
+        <!-- Cloud outside the boundary, crossed out -->
+        <path
+          d="M543 168a20 20 0 0 1 4-40 28 28 0 0 1 54-5 19 19 0 0 1 6 45H543z"
+          fill="#ffffff"
+          stroke="#5a554c"
+          stroke-width="2"></path>
+        <line
+          x1="527"
+          y1="98"
+          x2="653"
+          y2="186"
+          stroke="#9e3b2e"
+          stroke-width="3"></line>
+        <text
+          x="590"
+          y="222"
+          text-anchor="middle"
+          class="font-sans"
+          font-size="12"
+          font-weight="600"
+          fill="#9e3b2e">{t.noCloudLabel}</text
+        >
+      </svg>
+
+      <!-- Text equivalent for assistive tech + human-readable security notes. -->
+      <div>
+        <p class="sr-only">{t.diagramDesc}</p>
+        <ul class="space-y-4">
+          {
+            t.notes.map((note) => (
+              <li class="card p-4 text-sm text-ink">{note}</li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

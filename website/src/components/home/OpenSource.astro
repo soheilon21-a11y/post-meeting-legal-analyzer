@@ -1,0 +1,44 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+import { githubUrl, testCount } from "../../config";
+import en from "../../content/strings/en.json";
+
+const t = en.openSource;
+const testsLine = t.testsLine.replace("{count}", String(testCount));
+---
+
+<section id="open-source" class="section">
+  <div class="container-page">
+    <SectionHeading kicker={t.kicker} title={t.title} />
+
+    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-muted">
+      <span class="rounded-full bg-accent-soft px-3 py-1 text-sm font-semibold text-accent">
+        MIT
+      </span>
+      <span class="text-sm">{t.licenseLine}</span>
+      <span class="text-sm">{testsLine}</span>
+    </div>
+
+    <div class="mt-8">
+      <a
+        href={githubUrl}
+        rel="noopener"
+        class="inline-block rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white no-underline hover:bg-accent-dark"
+      >
+        {t.cta}
+      </a>
+    </div>
+
+    <div class="mt-12">
+      <h3 class="text-base font-semibold text-ink">{t.roadmapTitle}</h3>
+      <p class="mt-1 text-sm text-muted">{t.roadmapNote}</p>
+      <ul class="mt-4 flex flex-wrap gap-3">
+        {
+          t.roadmap.map((item) => (
+            <li class="card px-4 py-2 text-sm text-ink">{item}</li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

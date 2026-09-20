@@ -1,0 +1,26 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+import en from "../../content/strings/en.json";
+
+const t = en.how;
+---
+
+<section id="how-it-works" class="section">
+  <div class="container-page">
+    <SectionHeading kicker={t.kicker} title={t.title} lede={t.lede} />
+
+    <ol class="mt-12 grid gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-3">
+      {
+        t.steps.map((step) => (
+          <li class="bg-bg p-8">
+            <span class="font-mono text-sm font-semibold text-accent">
+              {step.num}
+            </span>
+            <h3 class="mt-4 text-lg font-semibold text-ink">{step.title}</h3>
+            <p class="mt-3 text-muted">{step.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,25 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+import Icon from "../Icon.astro";
+import en from "../../content/strings/en.json";
+
+const t = en.features;
+---
+
+<section id="features" class="section">
+  <div class="container-page">
+    <SectionHeading kicker={t.kicker} title={t.title} lede={t.lede} />
+
+    <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        t.cards.map((card) => (
+          <li class="card p-6">
+            <Icon name={card.icon} size={26} class="text-accent" />
+            <h3 class="mt-4 text-base font-semibold text-ink">{card.title}</h3>
+            <p class="mt-2 text-sm text-muted">{card.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
