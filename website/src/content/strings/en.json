@@ -188,7 +188,7 @@
   "about": {
     "kicker": "About",
     "title": "Why the name Mithra",
-    "bioPlaceholder": "[Author bio — to be written]",
+    "bioPlaceholder": "Soheil Onsori is a legal professional (LL.B.) building privacy-first AI tools for legal work. He is the author of the Post-Meeting Legal Analyzer and holds a Legal Engineering Certification from Harvey Academy and Anthropic's AI Fluency credential. His focus is the intersection of legal reasoning, applied AI, and compliance — GDPR and the EU AI Act.",
     "brandStory": "Mithra — an ancient Persian word meaning 'covenant': a promise made, witnessed, and kept. It is one of the oldest words in the Persian language and the oldest idea in law. We named this tool after that idea — every agreement deserves to be read as if its promise matters.",
     "dedication": "Dedicated to the memory of my father, Sohrab."
   },

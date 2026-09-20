@@ -15,8 +15,9 @@ const t = lang === "de" ? de.about : en.about;
   <div class="container-page">
     <SectionHeading kicker={t.kicker} title={t.title} />
 
-    <!-- Bio is an explicit placeholder, to be written by the author. -->
-    <p class="mt-8 text-sm italic text-muted">{t.bioPlaceholder}</p>
+    <p class="mt-8 measure text-lg leading-relaxed text-ink">
+      {t.bioPlaceholder}
+    </p>
 
     <p class="mt-6 measure text-lg leading-relaxed text-ink">
       {t.brandStory}
