@@ -1,22 +1,22 @@
 {
   "meta": {
-    "homeTitle": "Mithra — Post-Meeting Legal Analyzer",
+    "homeTitle": "Karnam — Post-Meeting Legal Analyzer",
     "homeTitle_draft": "DRAFT - pending human review",
-    "homeDescription": "Mithra analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
+    "homeDescription": "Karnam analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
     "homeDescription_draft": "DRAFT - pending human review",
-    "deTitle": "Mithra — Post-Meeting Legal Analyzer (Deutsch)",
+    "deTitle": "Karnam — Post-Meeting Legal Analyzer (Deutsch)",
     "deTitle_draft": "DRAFT - pending human review",
-    "deDescription": "Mithra analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
+    "deDescription": "Karnam analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
     "deDescription_draft": "DRAFT - pending human review",
-    "impressumTitle": "Impressum — Mithra",
+    "impressumTitle": "Impressum — Karnam",
     "impressumTitle_draft": "DRAFT - pending human review",
-    "impressumDescription": "Impressum der Mithra-Website.",
+    "impressumDescription": "Impressum der Karnam-Website.",
     "impressumDescription_draft": "DRAFT - pending human review",
-    "datenschutzTitle": "Datenschutzerklärung — Mithra",
+    "datenschutzTitle": "Datenschutzerklärung — Karnam",
     "datenschutzTitle_draft": "DRAFT - pending human review",
-    "datenschutzDescription": "Datenschutzerklärung der Mithra-Website.",
+    "datenschutzDescription": "Datenschutzerklärung der Karnam-Website.",
     "datenschutzDescription_draft": "DRAFT - pending human review",
-    "notFoundTitle": "Seite nicht gefunden — Mithra",
+    "notFoundTitle": "Seite nicht gefunden — Karnam",
     "notFoundTitle_draft": "DRAFT - pending human review",
     "notFoundDescription": "Die angeforderte Seite wurde nicht gefunden.",
     "notFoundDescription_draft": "DRAFT - pending human review"
@@ -61,12 +61,12 @@
   "hero": {
     "kicker": "Open Source · MIT-Lizenz",
     "kicker_draft": "DRAFT - pending human review",
-    "titleBrand": "Mithra",
+    "titleBrand": "Karnam",
     "titleBrand_draft": "DRAFT - pending human review",
     "titleRest": "— Post-Meeting Legal Analyzer",
     "titleRest_draft": "DRAFT - pending human review",
     "tagline": "Rechts-KI. Lokal. Belegt.",
-    "subheadline": "Mithra analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
+    "subheadline": "Karnam analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
     "ctaPrimary": "Auf GitHub ansehen",
     "ctaSecondary": "So funktioniert es",
     "artifact": {
@@ -129,7 +129,7 @@
       {
         "num": "02",
         "title": "Protokoll analysieren",
-        "body": "Mithra extrahiert Pflichten, Risiken und Aufgaben. Es fügt wörtliche Belege aus beiden Quellen hinzu und markiert Abweichungen.",
+        "body": "Karnam extrahiert Pflichten, Risiken und Aufgaben. Es fügt wörtliche Belege aus beiden Quellen hinzu und markiert Abweichungen.",
         "_draft": "DRAFT - pending human review"
       },
       {
@@ -203,7 +203,7 @@
     "title": "Eine abgeschlossene Umgebung. Nichts verlässt sie.",
     "lede": "Alle Dienste laufen innerhalb einer einzigen lokalen Docker-Compose-Umgebung.",
     "lede_draft": "DRAFT - pending human review",
-    "diagramTitle": "Mithra läuft vollständig auf Ihrem Rechner",
+    "diagramTitle": "Karnam läuft vollständig auf Ihrem Rechner",
     "diagramTitle_draft": "DRAFT - pending human review",
     "diagramDesc": "Ein Schaubild der lokalen Dienste. Ein Browser- oder API-Client ruft einen FastAPI-Dienst auf. FastAPI spricht mit Ollama für Sprach- und Einbettungsmodelle, mit Qdrant für die Vektorsuche, mit PostgreSQL für relationale Daten, mit Redis für Warteschlangen und mit MinIO für Objektspeicher. Alle Dienste laufen innerhalb einer Grenze mit der Bezeichnung „Ihr Rechner — Docker Compose“. Außerhalb der Grenze steht eine durchgestrichene Wolke mit der Bezeichnung „keine Cloud-Aufrufe“.",
     "diagramDesc_draft": "DRAFT - pending human review",
@@ -231,7 +231,7 @@
     "gdpr": {
       "title": "Ausrichtung an der DSGVO",
       "title_draft": "DRAFT - pending human review",
-      "body": "Da die Verarbeitung lokal erfolgt, gibt es keine Drittlandübermittlung. Die Datenminimierung ergibt sich aus der Architektur selbst. Mithra unterstützt Ihre Compliance-Arbeit, ersetzt sie jedoch nicht.",
+      "body": "Da die Verarbeitung lokal erfolgt, gibt es keine Drittlandübermittlung. Die Datenminimierung ergibt sich aus der Architektur selbst. Karnam unterstützt Ihre Compliance-Arbeit, ersetzt sie jedoch nicht.",
       "body_draft": "DRAFT - pending human review"
     },
     "aiAct": {
@@ -287,11 +287,10 @@
   "about": {
     "kicker": "Über uns",
     "kicker_draft": "DRAFT - pending human review",
-    "title": "Warum der Name Mithra",
+    "title": "Warum der Name Karnam",
     "title_draft": "DRAFT - pending human review",
     "bioPlaceholder": "Soheil Onsori ist Jurist (LL.B.) und entwickelt datenschutzfreundliche KI-Werkzeuge für die Rechtspraxis. Er ist der Autor des Post-Meeting Legal Analyzer und hat das Legal Engineering Certificate der Harvey Academy sowie das AI-Fluency-Zertifikat von Anthropic erworben. Sein Schwerpunkt liegt an der Schnittstelle von juristischem Denken, angewandter KI und Compliance — DSGVO und EU AI Act.",
-    "brandStory": "Mithra — ein altiranisches Wort für „Bündnis“: ein Versprechen, das gegeben, bezeugt und gehalten wird. Es ist eines der ältesten Wörter der persischen Sprache und die älteste Idee des Rechts. Wir haben dieses Werkzeug nach dieser Idee benannt — jede Vereinbarung verdient es, so gelesen zu werden, als käme es auf ihr Versprechen an.",
-    "dedication": "Dem Andenken meines Vaters Sohrab gewidmet."
+    "brandStory": "Karnam — vom mittelpersischen kārnāmag: eine schriftliche Aufzeichnung dessen, was tatsächlich geschehen ist. Das Wort lebt im heutigen Persisch als karname fort — der Bericht, der einen von der Schule bis ins Büro begleitet. Wir haben dieses Werkzeug nach dieser Idee benannt: Jede Handlung verdient eine schriftliche, überprüfbare Aufzeichnung."
   },
   "contact": {
     "kicker": "Kontakt",

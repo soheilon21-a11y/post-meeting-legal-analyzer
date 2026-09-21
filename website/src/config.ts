@@ -1,5 +1,5 @@
 /**
- * Single source of brand truth for the Mithra website.
+ * Single source of brand truth for the Karnam website.
  *
  * Every pinned value (URLs, base path, counts, accent color) lives here.
  * Components read from this file — numbers shown in copy are never hardcoded
@@ -15,11 +15,11 @@ export const siteUrl = "https://soheilon21-a11y.github.io";
  */
 export const base = "/post-meeting-legal-analyzer/";
 
-/** Brand name, used for the wordmark and the `Mithra` hero title. */
-export const name = "Mithra";
+/** Brand name, used for the wordmark and the `Karnam` hero title. */
+export const name = "Karnam";
 
 /** Full product name used in <title> and OG tags. */
-export const fullName = "Mithra — Post-Meeting Legal Analyzer";
+export const fullName = "Karnam — Post-Meeting Legal Analyzer";
 
 export const taglineEn = "Legal AI. 100% local. 100% cited.";
 export const taglineDe = "Rechts-KI. Lokal. Belegt.";

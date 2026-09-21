@@ -1,14 +1,14 @@
 {
   "meta": {
-    "homeTitle": "Mithra — Post-Meeting Legal Analyzer",
-    "homeDescription": "Mithra analyzes contracts and meeting transcripts 100% locally — every finding cited, every action audited, nothing leaves your machine.",
-    "deTitle": "Mithra — Post-Meeting Legal Analyzer (Deutsch)",
-    "deDescription": "Mithra analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
-    "impressumTitle": "Impressum — Mithra",
-    "impressumDescription": "Impressum der Mithra-Website.",
-    "datenschutzTitle": "Datenschutzerklärung — Mithra",
-    "datenschutzDescription": "Datenschutzerklärung der Mithra-Website.",
-    "notFoundTitle": "Page not found — Mithra",
+    "homeTitle": "Karnam — Post-Meeting Legal Analyzer",
+    "homeDescription": "Karnam analyzes contracts and meeting transcripts 100% locally — every finding cited, every action audited, nothing leaves your machine.",
+    "deTitle": "Karnam — Post-Meeting Legal Analyzer (Deutsch)",
+    "deDescription": "Karnam analysiert Verträge und Besprechungsprotokolle zu 100 % lokal — jede Aussage belegt, jede Handlung revisionssicher, nichts verlässt Ihren Rechner.",
+    "impressumTitle": "Impressum — Karnam",
+    "impressumDescription": "Impressum der Karnam-Website.",
+    "datenschutzTitle": "Datenschutzerklärung — Karnam",
+    "datenschutzDescription": "Datenschutzerklärung der Karnam-Website.",
+    "notFoundTitle": "Page not found — Karnam",
     "notFoundDescription": "The requested page could not be found."
   },
   "nav": [
@@ -22,10 +22,10 @@
   ],
   "hero": {
     "kicker": "Open source · MIT licensed",
-    "titleBrand": "Mithra",
+    "titleBrand": "Karnam",
     "titleRest": "— Post-Meeting Legal Analyzer",
     "tagline": "Legal AI. 100% local. 100% cited.",
-    "subheadline": "Mithra analyzes contracts and meeting transcripts 100% locally — every finding cited, every action audited, nothing leaves your machine.",
+    "subheadline": "Karnam analyzes contracts and meeting transcripts 100% locally — every finding cited, every action audited, nothing leaves your machine.",
     "ctaPrimary": "View on GitHub",
     "ctaSecondary": "How it works",
     "artifact": {
@@ -78,7 +78,7 @@
       {
         "num": "02",
         "title": "Analyze the transcript",
-        "body": "Mithra extracts obligations, risks, and action items, attaches verbatim dual citations, and flags discrepancies."
+        "body": "Karnam extracts obligations, risks, and action items, attaches verbatim dual citations, and flags discrepancies."
       },
       {
         "num": "03",
@@ -138,7 +138,7 @@
     "kicker": "Architecture & security",
     "title": "One bounded box. Nothing leaves it.",
     "lede": "Every service runs inside a single local Docker Compose boundary.",
-    "diagramTitle": "Mithra runs entirely on your machine",
+    "diagramTitle": "Karnam runs entirely on your machine",
     "diagramDesc": "A diagram of the local stack. A browser or API client calls a FastAPI service. FastAPI talks to Ollama for language and embedding models, Qdrant for vector search, PostgreSQL for relational data, Redis for queues, and MinIO for object storage. All of these run inside one boundary labelled “Your machine — Docker Compose”. Outside the boundary a crossed-out cloud is labelled “no cloud calls”.",
     "boundaryLabel": "Your machine — Docker Compose",
     "noCloudLabel": "no cloud calls",
@@ -154,7 +154,7 @@
     "title": "Privacy by architecture, not by policy",
     "gdpr": {
       "title": "GDPR alignment",
-      "body": "Because processing happens locally, there is no third-country transfer and data minimization is enforced by the architecture itself. Mithra supports your compliance work — it does not replace it."
+      "body": "Because processing happens locally, there is no third-country transfer and data minimization is enforced by the architecture itself. Karnam supports your compliance work — it does not replace it."
     },
     "aiAct": {
       "title": "EU AI Act alignment",
@@ -187,10 +187,9 @@
   },
   "about": {
     "kicker": "About",
-    "title": "Why the name Mithra",
+    "title": "Why the name Karnam",
     "bioPlaceholder": "Soheil Onsori is a legal professional (LL.B.) building privacy-first AI tools for legal work. He is the author of the Post-Meeting Legal Analyzer and holds a Legal Engineering Certification from Harvey Academy and Anthropic's AI Fluency credential. His focus is the intersection of legal reasoning, applied AI, and compliance — GDPR and the EU AI Act.",
-    "brandStory": "Mithra — an ancient Persian word meaning 'covenant': a promise made, witnessed, and kept. It is one of the oldest words in the Persian language and the oldest idea in law. We named this tool after that idea — every agreement deserves to be read as if its promise matters.",
-    "dedication": "Dedicated to the memory of my father, Sohrab."
+    "brandStory": "Karnam — from the Middle Persian kārnāmag: a written record of what was actually done. The word still lives in Persian today as karname — the report that follows you from school to office. We named this tool after that idea: every action deserves a written, verifiable record."
   },
   "contact": {
     "kicker": "Contact",
