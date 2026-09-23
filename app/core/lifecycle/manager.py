@@ -57,7 +57,7 @@ class LifecycleManager:
             import httpx
 
             async with httpx.AsyncClient() as client:
-                response = await client.get(f"{settings.url}/health", timeout=5.0)
+                response = await client.get(f"{settings.url}/readyz", timeout=5.0)
                 response.raise_for_status()
             logger.info("qdrant_connected", host=settings.host, port=settings.port)
         except Exception as exc:
