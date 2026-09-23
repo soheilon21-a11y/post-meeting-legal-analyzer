@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 REPORT_TITLE = "Legal Analysis Report"
 REPORT_FOOTER = (
     "Generated locally by Post-Meeting Legal Analyzer"
-    " â€” ready_for_review by responsible attorney"
+    " - subject to review by the responsible attorney"
 )
 
 _RISK_TYPES = frozenset({"risk"})
