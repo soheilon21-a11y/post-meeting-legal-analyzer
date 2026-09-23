@@ -3,6 +3,9 @@
 Redacted copy of the local smoke-test log; identifiers anonymized.
 
 ## Result: PASS with findings
+
+Update: F-1, F-2, F-3 fixed — see commit history.
+
 Both flows (analyze+RAG, redline+HITL) completed end-to-end locally.
 All findings below are logged for follow-up.
 
