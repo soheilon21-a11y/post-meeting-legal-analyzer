@@ -16,7 +16,10 @@ from sqlalchemy import BinaryExpression
 from app.api.dependencies.db import get_db
 from app.core.security.tokens import SESSION_COOKIE_NAME
 from app.core.security.tokens import TokenService
-from app.db.models import AuditEvent, DocumentVersion, ProcessingStatus, User
+from app.db.models import AuditEvent
+from app.db.models import DocumentVersion
+from app.db.models import ProcessingStatus
+from app.db.models import User
 from app.db.models.session import Session
 from app.main import create_app
 
@@ -173,7 +176,7 @@ async def test_register_sets_hardened_local_session_cookie(app: Any, session: Fa
     async with _client(app) as client:
         registered = await _register(client)
 
-    raw = client_last = None  # noqa: F841 - placeholder removed below
+    raw = client_last = None
     del raw, client_last
 
     assert session.of_type(Session).__len__() == 1

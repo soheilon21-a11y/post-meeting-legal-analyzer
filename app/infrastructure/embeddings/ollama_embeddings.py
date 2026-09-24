@@ -55,10 +55,7 @@ class OllamaEmbeddings(EmbeddingPort):
                 f"Ollama embed call failed: {exc}",
             ) from exc
 
-        if isinstance(response, dict):
-            embeddings = response.get("embeddings")
-        else:
-            embeddings = getattr(response, "embeddings", None)
+        embeddings = response.get("embeddings") if isinstance(response, dict) else getattr(response, "embeddings", None)
 
         if not embeddings or len(embeddings) != len(texts):
             raise ProcessingError(

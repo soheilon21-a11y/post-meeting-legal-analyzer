@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import io
-from types import SimpleNamespace
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 from uuid import UUID
-from uuid import uuid4
 
 import pytest
 from docx import Document as DocxDocument

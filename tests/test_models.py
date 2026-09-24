@@ -73,7 +73,13 @@ async def test_organization_creation(db_session: AsyncSession):
 
 @pytest.mark.anyio
 async def test_matter_with_member(db_session: AsyncSession, sample_org_id, sample_user_id):
-    user = User(id=sample_user_id, email="test@example.com", display_name="Test User", organization_id=sample_org_id, hashed_password="hashed")
+    user = User(
+        id=sample_user_id,
+        email="test@example.com",
+        display_name="Test User",
+        organization_id=sample_org_id,
+        hashed_password="hashed",
+    )
     org = Organization(id=sample_org_id, name="Test Firm")
     db_session.add_all([org, user])
     await db_session.flush()
@@ -259,7 +265,13 @@ async def test_redline_job_with_changes(db_session: AsyncSession, sample_org_id)
 
 @pytest.mark.anyio
 async def test_audit_event(db_session: AsyncSession, sample_org_id, sample_user_id):
-    user = User(id=sample_user_id, email="test@example.com", display_name="Test User", organization_id=sample_org_id, hashed_password="hashed")
+    user = User(
+        id=sample_user_id,
+        email="test@example.com",
+        display_name="Test User",
+        organization_id=sample_org_id,
+        hashed_password="hashed",
+    )
     org = Organization(id=sample_org_id, name="Test Firm")
     db_session.add_all([org, user])
     await db_session.flush()
