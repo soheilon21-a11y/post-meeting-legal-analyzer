@@ -70,7 +70,7 @@ async def _chain_state(session: AsyncSession) -> tuple[str, int]:
             .limit(1)
         )
         last = result.scalars().first()
-    except Exception:  # noqa: BLE001 - any DB error degrades to a fresh chain
+    except Exception:
         return GENESIS_HASH, 0
     if isinstance(last, AuditEvent) and last.seq is not None:
         return (last.row_hash if last.row_hash is not None else GENESIS_HASH), int(last.seq)

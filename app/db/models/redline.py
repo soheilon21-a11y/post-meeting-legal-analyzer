@@ -5,12 +5,9 @@ from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean
 from sqlalchemy import DateTime
-from sqlalchemy import Enum
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import JSONB
@@ -19,8 +16,8 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
-from app.db.base import UUIDMixin
 from app.db.base import TimestampMixin
+from app.db.base import UUIDMixin
 
 if TYPE_CHECKING:
     import uuid

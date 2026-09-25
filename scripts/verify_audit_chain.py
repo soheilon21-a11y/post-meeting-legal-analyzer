@@ -19,13 +19,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from sqlalchemy import select  # noqa: E402
-from sqlalchemy.ext.asyncio import AsyncSession  # noqa: E402
-from sqlalchemy.ext.asyncio import create_async_engine  # noqa: E402
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine
 
-from app.core.config import get_settings  # noqa: E402
-from app.db.models.audit import AuditEvent  # noqa: E402
-from app.infrastructure.persistence.audit_chain import verify_audit_chain  # noqa: E402
+from app.core.config import get_settings
+from app.db.models.audit import AuditEvent
+from app.infrastructure.persistence.audit_chain import verify_audit_chain
 
 
 async def _run() -> int:

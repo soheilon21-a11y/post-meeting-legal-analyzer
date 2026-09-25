@@ -62,10 +62,7 @@ class TokenOptimizer:
                 budget=budget,
             )
 
-        if len(kept) == len(context_items):
-            decision = OptimizationDecision.KEEP
-        else:
-            decision = OptimizationDecision.EXCLUDE
+        decision = OptimizationDecision.KEEP if len(kept) == len(context_items) else OptimizationDecision.EXCLUDE
 
         return OptimizedContext(
             items=tuple(kept),

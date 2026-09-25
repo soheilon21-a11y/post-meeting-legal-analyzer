@@ -69,14 +69,15 @@ def setup_audit_tables():
             await conn.execute(
                 sa_text(
                     """
-                    INSERT INTO users (id, organization_id, email, display_name, hashed_password, is_active)
+                    INSERT INTO users (id, organization_id, email, display_name, hashed_password, is_active, is_deleted)
                     VALUES (
                         '12345678-1234-1234-1234-123456789012',
                         '11111111-1111-1111-1111-111111111111',
                         'audit-test@example.com',
                         'Audit Test User',
                         'not-used-in-this-test',
-                        true
+                        true,
+                        false
                     )
                     ON CONFLICT (id) DO NOTHING
                     """

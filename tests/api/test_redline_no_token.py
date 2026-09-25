@@ -10,22 +10,20 @@ from httpx import AsyncClient
 
 from app.api.dependencies.db import get_db
 from app.core.security.tokens import TokenService
-from app.db.models import (
-    AuditEvent,
-    Document,
-    DocumentClassification,
-    DocumentType,
-    DocumentVersion,
-    Matter,
-    MatterClassification,
-    MatterMember,
-    MatterMemberRole,
-    MatterStatus,
-    ProcessingStatus,
-    RedlineChange,
-    RedlineJob,
-    User,
-)
+from app.db.models import AuditEvent
+from app.db.models import Document
+from app.db.models import DocumentClassification
+from app.db.models import DocumentType
+from app.db.models import DocumentVersion
+from app.db.models import Matter
+from app.db.models import MatterClassification
+from app.db.models import MatterMember
+from app.db.models import MatterMemberRole
+from app.db.models import MatterStatus
+from app.db.models import ProcessingStatus
+from app.db.models import RedlineChange
+from app.db.models import RedlineJob
+from app.db.models import User
 from app.main import create_app
 
 ORG_ID = UUID("aaaaaaaa-0000-0000-0000-000000000001")
@@ -221,15 +219,9 @@ def _app(session: FakeSession) -> Any:
 def _patch_offline_generation(monkeypatch: pytest.MonkeyPatch) -> None:
     """No Ollama/Qdrant in unit tests: embed fast-fails (caught by the
     endpoint's RAG try/except) and generation is stubbed deterministically."""
-    from app.application.dtos.internal.redline_generation import (
-        GeneratedRedlineCitation,
-    )
-    from app.application.dtos.internal.redline_generation import (
-        GeneratedRedlineChange,
-    )
-    from app.application.dtos.internal.redline_generation import (
-        RedlineGenerationResult,
-    )
+    from app.application.dtos.internal.redline_generation import GeneratedRedlineChange
+    from app.application.dtos.internal.redline_generation import GeneratedRedlineCitation
+    from app.application.dtos.internal.redline_generation import RedlineGenerationResult
     from app.infrastructure.llm.ollama_redline import OllamaRedlineGeneration
 
     monkeypatch.setenv("OLLAMA_HOST", "http://127.0.0.1:9")

@@ -79,7 +79,7 @@ worker = [
 
 [tool.ruff]
 target-version = "py312"
-line-length = 100
+line-length = 120
 exclude = [
     ".git",
     ".venv",
@@ -115,7 +115,10 @@ isort.known-first-party = ["app"]
 isort.force-single-line = true
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S101", "PLR2004", "B017"]
+"tests/**/*.py" = ["S101", "PLR2004", "B017", "TC001", "TC003"]
+"app/db/models/**" = ["TC003"]
+"app/api/v1/redline.py" = ["TC001"]
+"app/core/exceptions/handlers.py" = ["TC001"]
 
 [tool.ruff.format]
 quote-style = "double"
