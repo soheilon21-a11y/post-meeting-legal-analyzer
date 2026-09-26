@@ -2,6 +2,8 @@
 
 Privacy-first LegalTech platform for analyzing legal meeting outputs using local AI.
 
+![Tests](https://github.com/soheilon21-a11y/post-meeting-legal-analyzer/actions/workflows/tests.yml/badge.svg?branch=main)
+
 ## Architecture
 
 - **Privacy-first**: 100% local AI inference — no cloud AI APIs
