@@ -36,7 +36,7 @@
       "transcriptQuote": "“We agreed the supplier’s liability stays uncapped for direct damages.”",
       "contractLabel": "Contract",
       "contractQuote": "“Liability is limited to fees paid in the preceding twelve months.”",
-      "discrepancy": "Discrepancy flagged",
+      "discrepancy": "Compare side by side",
       "approve": "Approve",
       "reject": "Reject"
     }
@@ -78,11 +78,11 @@
       {
         "num": "02",
         "title": "Analyze the transcript",
-        "body": "Karnam extracts obligations, risks, and action items, attaches verbatim dual citations, and flags discrepancies."
+        "body": "Karnam extracts obligations, risks, and action items, and attaches verbatim dual citations."
       },
       {
         "num": "03",
-        "title": "Attorney decides",
+        "title": "Legal professional decides",
         "body": "Every AI redline requires an explicit approve or reject — each decision is stamped into the audit trail."
       }
     ]
@@ -105,12 +105,12 @@
       {
         "icon": "quote",
         "title": "Verbatim dual citations",
-        "body": "Quotes from the transcript and the indexed contract, with discrepancy flags when they differ."
+        "body": "Quotes from the transcript and the indexed contract, shown side by side for direct comparison."
       },
       {
         "icon": "check",
         "title": "Human-in-the-loop redlining",
-        "body": "The model proposes; nothing is applied until the attorney approves or rejects it."
+        "body": "The model proposes; nothing is applied until the reviewing legal professional approves or rejects it."
       },
       {
         "icon": "lock",
@@ -130,7 +130,7 @@
       {
         "icon": "shield",
         "title": "Citation validation",
-        "body": "Sources are checked against real document IDs — invented citations are refused."
+        "body": "Analysis citations are checked against real document IDs — invented sources are refused."
       }
     ]
   },
@@ -146,7 +146,7 @@
     "notes": [
       "Model swappable with one config line.",
       "Hash-chained audit trail for every action.",
-      "Citation validation against real document IDs."
+      "Analysis citations validated against real document IDs."
     ]
   },
   "privacy": {
@@ -158,7 +158,7 @@
     },
     "aiAct": {
       "title": "EU AI Act alignment",
-      "body": "Human-in-the-loop by design, transparent citations for every finding, and a complete audit trail. The attorney always makes the final call."
+      "body": "Human-in-the-loop by design, transparent citations for every finding, and a complete audit trail. A reviewing legal professional always makes the final call."
     },
     "notLegalAdvice": "This website is not legal advice.",
     "site": {
@@ -180,6 +180,7 @@
     "roadmapTitle": "Roadmap teaser",
     "roadmapNote": "Teasers — not commitments.",
     "roadmap": [
+      "Explicit discrepancy flag (API + PDF report)",
       "German UI for the application",
       "Additional export formats",
       "Hosted documentation"
@@ -189,7 +190,7 @@
     "kicker": "About",
     "title": "Why the name Karnam",
     "bioPlaceholder": "Soheil Onsori is a legal professional (LL.B.) building privacy-first AI tools for legal work. He is the author of the Post-Meeting Legal Analyzer and holds a Legal Engineering Certification from Harvey Academy and Anthropic's AI Fluency credential. His focus is the intersection of legal reasoning, applied AI, and compliance — GDPR and the EU AI Act.",
-    "brandStory": "Karnam — from the Middle Persian kārnāmag: a written record of what was actually done. The word still lives in Persian today as karname — the report that follows you from school to office. We named this tool after that idea: every action deserves a written, verifiable record."
+    "brandStory": "Karnam — from the Middle Persian kārnāmag: a written record of what was actually done. The word still lives in Persian today as karname — the report that follows you from school to office. I named this tool after that idea: every action deserves a written, verifiable record."
   },
   "contact": {
     "kicker": "Contact",

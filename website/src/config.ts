@@ -38,8 +38,8 @@ export const githubLicenseUrl = `${githubUrl}/blob/main/LICENSE`;
 export const accentColor = "#1E4B3C";
 export const accentAlternative = "#6B1F2A";
 
-/** Test count — the ONLY place the number 284 appears. */
-export const testCount = 284;
+/** Pytest count reported by the latest passing GitHub Actions run. */
+export const testCount = 287;
 
 export const license = "MIT";
 export const copyright = "© 2026 soheilon21-a11y";

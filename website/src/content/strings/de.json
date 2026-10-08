@@ -48,7 +48,7 @@
       "_draft": "DRAFT - pending human review"
     },
     {
-      "label": "Über uns",
+      "label": "Über Karnam",
       "href": "/de/#about",
       "_draft": "DRAFT - pending human review"
     },
@@ -77,7 +77,7 @@
       "transcriptQuote": "“We agreed the supplier’s liability stays uncapped for direct damages.”",
       "contractLabel": "Contract",
       "contractQuote": "“Liability is limited to fees paid in the preceding twelve months.”",
-      "discrepancy": "Discrepancy flagged",
+      "discrepancy": "Gegenüberstellung",
       "approve": "Approve",
       "reject": "Reject"
     }
@@ -129,12 +129,12 @@
       {
         "num": "02",
         "title": "Protokoll analysieren",
-        "body": "Karnam extrahiert Pflichten, Risiken und Aufgaben. Es fügt wörtliche Belege aus beiden Quellen hinzu und markiert Abweichungen.",
+        "body": "Karnam extrahiert Pflichten, Risiken und Aufgaben. Es fügt wörtliche Belege aus beiden Quellen hinzu.",
         "_draft": "DRAFT - pending human review"
       },
       {
         "num": "03",
-        "title": "Anwalt entscheidet",
+        "title": "Juristische Fachperson entscheidet",
         "body": "Jedes KI-Redlining erfordert eine ausdrückliche Freigabe oder Ablehnung. Jede Entscheidung wird in den Audit-Trail geschrieben.",
         "_draft": "DRAFT - pending human review"
       }
@@ -162,13 +162,13 @@
       {
         "icon": "quote",
         "title": "Wörtliche Doppelbelege",
-        "body": "Zitate aus dem Besprechungsprotokoll und aus dem indexierten Vertrag. Abweichungen werden markiert.",
+        "body": "Zitate aus dem Besprechungsprotokoll und aus dem indexierten Vertrag, nebeneinander zum direkten Abgleich dargestellt.",
         "_draft": "DRAFT - pending human review"
       },
       {
         "icon": "check",
         "title": "Human-in-the-Loop-Redlining",
-        "body": "Das Modell schlägt vor. Nichts wird übernommen, bis der Anwalt zustimmt oder ablehnt.",
+        "body": "Das Modell schlägt vor. Nichts wird übernommen, bis die zuständige juristische Fachperson zustimmt oder ablehnt.",
         "_draft": "DRAFT - pending human review"
       },
       {
@@ -192,7 +192,7 @@
       {
         "icon": "shield",
         "title": "Belegprüfung",
-        "body": "Belege werden gegen echte Dokument-IDs geprüft. Erfundene Quellen werden abgelehnt.",
+        "body": "Analyse-Belege werden gegen echte Dokument-IDs geprüft. Erfundene Quellen werden abgelehnt.",
         "_draft": "DRAFT - pending human review"
       }
     ]
@@ -216,7 +216,7 @@
     "notes": [
       "Modell mit einer Konfigurationszeile austauschbar.",
       "Revisionssicherer Audit-Trail für jede Handlung.",
-      "Belegprüfung gegen echte Dokument-IDs."
+      "Belegprüfung im Analysebericht gegen echte Dokument-IDs."
     ],
     "notes_draft": [
       "DRAFT - pending human review",
@@ -237,7 +237,7 @@
     "aiAct": {
       "title": "Ausrichtung am EU AI Act",
       "title_draft": "DRAFT - pending human review",
-      "body": "Human-in-the-Loop ist Teil des Entwurfs. Jeder Befund ist transparent belegt, und der Audit-Trail ist vollständig. Die letzte Entscheidung trifft immer der Anwalt.",
+      "body": "Human-in-the-Loop ist Teil des Entwurfs. Jeder Befund ist transparent belegt, und der Audit-Trail ist vollständig. Die letzte Entscheidung trifft immer die zuständige juristische Fachperson.",
       "body_draft": "DRAFT - pending human review"
     },
     "notLegalAdvice": "Diese Website ist keine Rechtsberatung.",
@@ -274,6 +274,7 @@
     "roadmapNote": "Unverbindliche Ankündigungen.",
     "roadmapNote_draft": "DRAFT - pending human review",
     "roadmap": [
+      "Explizite Abweichungs-Hinweise (API + PDF-Bericht)",
       "Deutsche Benutzeroberfläche für die Anwendung",
       "Weitere Exportformate",
       "Gehostete Dokumentation"
@@ -285,12 +286,12 @@
     ]
   },
   "about": {
-    "kicker": "Über uns",
+    "kicker": "Über Karnam",
     "kicker_draft": "DRAFT - pending human review",
     "title": "Warum der Name Karnam",
     "title_draft": "DRAFT - pending human review",
     "bioPlaceholder": "Soheil Onsori ist Jurist (LL.B.) und entwickelt datenschutzfreundliche KI-Werkzeuge für die Rechtspraxis. Er ist der Autor des Post-Meeting Legal Analyzer und hat das Legal Engineering Certificate der Harvey Academy sowie das AI-Fluency-Zertifikat von Anthropic erworben. Sein Schwerpunkt liegt an der Schnittstelle von juristischem Denken, angewandter KI und Compliance — DSGVO und EU AI Act.",
-    "brandStory": "Karnam — vom mittelpersischen kārnāmag: eine schriftliche Aufzeichnung dessen, was tatsächlich geschehen ist. Das Wort lebt im heutigen Persisch als karname fort — der Bericht, der einen von der Schule bis ins Büro begleitet. Wir haben dieses Werkzeug nach dieser Idee benannt: Jede Handlung verdient eine schriftliche, überprüfbare Aufzeichnung."
+    "brandStory": "Karnam — vom mittelpersischen kārnāmag: eine schriftliche Aufzeichnung dessen, was tatsächlich geschehen ist. Das Wort lebt im heutigen Persisch als karname fort — der Bericht, der einen von der Schule bis ins Büro begleitet. Ich habe dieses Werkzeug nach dieser Idee benannt: Jede Handlung verdient eine schriftliche, überprüfbare Aufzeichnung."
   },
   "contact": {
     "kicker": "Kontakt",
