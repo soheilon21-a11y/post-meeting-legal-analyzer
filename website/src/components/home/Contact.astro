@@ -1,6 +1,7 @@
 ---
 import SectionHeading from "../SectionHeading.astro";
-import { githubIssuesUrl, githubDiscussionsUrl } from "../../config";
+import Icon from "../Icon.astro";
+import { githubUrl, githubIssuesUrl, githubDiscussionsUrl } from "../../config";
 import en from "../../content/strings/en.json";
 import de from "../../content/strings/de.json";
 
@@ -10,27 +11,100 @@ interface Props {
 
 const { lang = "en" } = Astro.props;
 const t = lang === "de" ? de.contact : en.contact;
+
+const linkedinUrl = "https://www.linkedin.com/in/soheil-onsori/";
+const emailAddress = "soheil.on21@gmail.com";
 ---
 
 <section id="contact" class="section">
   <div class="container-page">
     <SectionHeading kicker={t.kicker} title={t.title} lede={t.body} />
 
-    <div class="mt-8 flex flex-wrap gap-3">
+    <ul class="mt-12 grid gap-6 sm:grid-cols-3">
+      <li>
+        <a
+          href={`mailto:${emailAddress}`}
+          class="card flex h-full flex-col gap-4 p-6 no-underline hover:border-accent"
+        >
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+            class="text-accent"
+          >
+            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+            <path d="M3 7l9 6 9-6"></path>
+          </svg>
+          <div>
+            <h3 class="text-base font-semibold text-ink">{t.emailLabel}</h3>
+            <p class="mt-1 break-all text-sm text-muted">{emailAddress}</p>
+          </div>
+        </a>
+      </li>
+
+      <li>
+        <a
+          href={linkedinUrl}
+          rel="noopener"
+          class="card flex h-full flex-col gap-4 p-6 no-underline hover:border-accent"
+        >
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+            focusable="false"
+            class="text-accent"
+          >
+            <path
+              d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"
+            ></path>
+          </svg>
+          <div>
+            <h3 class="text-base font-semibold text-ink">{t.linkedinLabel}</h3>
+            <p class="mt-1 text-sm text-muted">soheil-onsori</p>
+          </div>
+        </a>
+      </li>
+
+      <li>
+        <a
+          href={githubUrl}
+          rel="noopener"
+          class="card flex h-full flex-col gap-4 p-6 no-underline hover:border-accent"
+        >
+          <Icon name="github" size={26} class="text-accent" />
+          <div>
+            <h3 class="text-base font-semibold text-ink">{t.githubLabel}</h3>
+            <p class="mt-1 text-sm text-muted">soheilon21-a11y</p>
+          </div>
+        </a>
+      </li>
+    </ul>
+
+    <p class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
       <a
         href={githubIssuesUrl}
         rel="noopener"
-        class="rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white no-underline hover:bg-accent-dark"
+        class="text-accent no-underline hover:text-accent-dark"
       >
         {t.issuesCta}
       </a>
       <a
         href={githubDiscussionsUrl}
         rel="noopener"
-        class="rounded-lg border border-border px-5 py-3 text-sm font-semibold text-ink no-underline hover:border-accent hover:text-accent"
+        class="text-accent no-underline hover:text-accent-dark"
       >
         {t.discussionsCta}
       </a>
-    </div>
+    </p>
   </div>
 </section>

@@ -19,6 +19,11 @@
   --color-risk-med: #8f6418; /* AA — small dots only */
   --color-risk-low: #3e6b4f; /* AA — small dots only */
 
+  /* Footer dark band */
+  --color-footer-bg: #14352a; /* deep green — footer band background */
+  --color-footer-text: #f5f1e8; /* ~13:1 on footer-bg (AAA) — headings */
+  --color-footer-muted: #b6c9c0; /* ~7:1 on footer-bg (AA) — links/body */
+
   /* Type — system stacks only, zero font bytes */
   --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
     serif;
