@@ -194,11 +194,12 @@
   },
   "contact": {
     "kicker": "Contact",
-    "title": "Questions, bugs, ideas?",
+    "title": "Get in touch",
     "body": "Questions, feedback, or collaboration — reach out through any of these channels.",
     "emailLabel": "Email",
     "linkedinLabel": "LinkedIn",
     "githubLabel": "GitHub",
+    "issuesLead": "Bugs and feature requests:",
     "issuesCta": "Open an issue",
     "discussionsCta": "Start a discussion"
   },

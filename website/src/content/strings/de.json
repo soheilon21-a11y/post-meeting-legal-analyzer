@@ -296,7 +296,7 @@
   "contact": {
     "kicker": "Kontakt",
     "kicker_draft": "DRAFT - pending human review",
-    "title": "Fragen, Fehler, Ideen?",
+    "title": "Kontakt aufnehmen",
     "title_draft": "DRAFT - pending human review",
     "body": "Fragen, Feedback oder Zusammenarbeit — erreichen Sie mich über einen dieser Kanäle.",
     "body_draft": "DRAFT - pending human review",
@@ -306,7 +306,9 @@
     "linkedinLabel_draft": "DRAFT - pending human review",
     "githubLabel": "GitHub",
     "githubLabel_draft": "DRAFT - pending human review",
-    "issuesCta": "Problem melden",
+    "issuesLead": "Fehler und Vorschläge:",
+    "issuesLead_draft": "DRAFT - pending human review",
+    "issuesCta": "Issue erstellen",
     "issuesCta_draft": "DRAFT - pending human review",
     "discussionsCta": "Diskussion starten",
     "discussionsCta_draft": "DRAFT - pending human review"

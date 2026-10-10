@@ -90,18 +90,20 @@ const emailAddress = "soheil.on21@gmail.com";
       </li>
     </ul>
 
-    <p class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
+    <p class="mt-8 text-sm text-muted">
+      {t.issuesLead}{" "}
       <a
         href={githubIssuesUrl}
         rel="noopener"
-        class="text-accent no-underline hover:text-accent-dark"
+        class="text-muted no-underline hover:text-accent"
       >
         {t.issuesCta}
       </a>
+      <span aria-hidden="true"> · </span>
       <a
         href={githubDiscussionsUrl}
         rel="noopener"
-        class="text-accent no-underline hover:text-accent-dark"
+        class="text-muted no-underline hover:text-accent"
       >
         {t.discussionsCta}
       </a>
