@@ -195,7 +195,10 @@
   "contact": {
     "kicker": "Contact",
     "title": "Questions, bugs, ideas?",
-    "body": "Everything happens on GitHub — no email address and no contact form, by design.",
+    "body": "Questions, feedback, or collaboration — reach out through any of these channels.",
+    "emailLabel": "Email",
+    "linkedinLabel": "LinkedIn",
+    "githubLabel": "GitHub",
     "issuesCta": "Open an issue",
     "discussionsCta": "Start a discussion"
   },
@@ -209,6 +212,14 @@
     "datenschutzLabel": "Datenschutzerklärung",
     "licenseTitle": "License",
     "licenseLabel": "MIT",
+    "brandNote": "Runs locally. No cloud, no trackers, no cookies.",
+    "exploreTitle": "Explore",
+    "followTitle": "Follow",
+    "problemLabel": "Problem",
+    "roadmapLabel": "Roadmap teaser",
+    "aboutLabel": "About",
+    "contactLabel": "Contact",
+    "mitLicenseLabel": "MIT License",
     "trust": "0 external requests · 0 cookies · 0 trackers"
   },
   "notFound": {
